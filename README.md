@@ -1,8 +1,8 @@
-# sgmms-h5
+# 时间打卡插件
 
 > A Vue.js project
 
-## Build Setup
+## 启动步骤
 
 ``` bash
 # install dependencies
