@@ -1,19 +1,13 @@
 <template>
-  <div class="calender">
-  
-    <div class="calender-title-wrapper">
-      <div class="calender-title">
-        <div class="calender-arrow-item left2" v-if="false"></div>
-        <div class="calender-arrow-item left1" @click="month--">
-          <i class="iconfont">&#xe61c;</i>
-        </div>
-        <div class="calender-Date-text">{{year}}年{{month}}月</div>
-        <div class="calender-arrow-item right1" @click="month++">
-          <i class="iconfont">&#xe616;</i>
-        </div>
-        <div class="calender-arrow-item right2" v-if="false"></div>
+  <div class="week">
+    <div class="week-top">
+      <div class="title">签到日历</div>
+      <div class="desc" @click="tocalender">
+        完整日历
+        <i class="iconfont">&#xe677;</i>
       </div>
     </div>
+
     <div class="calender-content-wrapper">
       <div class="calender-days-wrapper">
         <div class="calender-days">Sun</div>
@@ -24,40 +18,22 @@
         <div class="calender-days">Fri</div>
         <div class="calender-days">Sat</div>
       </div>
-      <div class="calender-content">
-        <div
-          class="calender-item-wrapper"
-          v-for="(item,index) in daysArr"
-          :key="index"
-          :class="{'no-current-day':item.month!=month,
-                    active:item === clickItemObj,
-                    currentDay:item.day===_CurrentDate.day&&
-                               item.month===_CurrentDate.month&&
-                               item.year===_CurrentDate.year}"
-          @click="_clickDaysItem(item)"
-        >
-          <div class="calender-item" :class="item.chetrue?'d':''" @click="handelDay(item.id)">
-            <span v-if="item.day==day">今</span>
-            <span v-else>{{item.day}}</span>
-          </div>
+
+      <div class="calender-days-wrapper">
+        <div class="calender-arrow-item" v-for="(item,index) in  sevenday" :key="index" @click="handelDay(item.id)">
+          <div v-if="item.day==day"  :class="item.chetrue?'d':''">今</div>
+          <div v-else :class="item.chetrue?'d':''">{{item.day}}</div>
         </div>
       </div>
-      <!-- <div class="calender-mask-wrapper">
-        <div class="calender-mask-item" v-for="(item ,index) in markArr" :key="index">
-          <span class="tem" :style="{background:item.color}"></span>
-          <span class="text">{{item.name}}</span>
-        </div>
-      </div> -->
     </div>
   </div>
 </template>
 
 <script>
 import { Toast,InfiniteScroll } from 'mint-ui'
-
 export default {
-  name: "calender",
   props: {
+    id:Number,
     markArr: {
       type: Array,
       default() {
@@ -72,20 +48,24 @@ export default {
       year: "",
       currentDays: "",
       daysArr: [],
-      clickItemObj: {}
+      clickItemObj: {},
+      sevenday: []
     };
   },
   mounted() {
     this._getCurrentDate();
   },
-  created() {},
   methods: {
+    tocalender(){
+         this.$router.push({name:'calender',params: {id:this.id}});
+
+    },
     handelDay(id) {
-      if(id===0){
-      Toast('未签到');
-      }else{
-        this.$router.push({name:'detailed',params: {id:id}});
-         Toast('今日已签到');
+      if (id === 0) {
+        Toast("未签到");
+      } else {
+          this.$emit("sendiptVal", id) //传值父组件
+         this.$router.push({name:'detailed',params: {id}});
       }
     },
     //点击日期
@@ -97,7 +77,6 @@ export default {
         this.clickItemObj = item;
       }
       //非当前月份跳转
-
       if (item.month != this.month) {
         this.month = item.month;
       }
@@ -133,12 +112,14 @@ export default {
       let date = new Date();
       this.day = date.getDate();
       this.month = date.getMonth() + 1;
+
       this.year = date.getFullYear();
       this._getDaysForMonth(this.year, this.month, 1);
     },
     //获取切换页月份第一天是周几与最后一天并获取月前与月后填补数组
     _getFirstDaysForMonth(year, month) {
       let weekdays = new Date(`${year}-${month}-01`).getDay();
+
       let beforeMonthDaysArr = [];
       let currentMonthDaysArr = [];
       let afterMonthDaysArr = [];
@@ -197,6 +178,16 @@ export default {
         ...currentMonthDaysArr,
         ...afterMonthDaysArr
       ];
+      let date = new Date();
+      var daydate =
+        date.getFullYear() +
+        "-" +
+        parseInt(date.getMonth() + 1) +
+        "-" +
+        date.getDate();
+      var daydaysArr = [];
+
+      //循环获取最新七天时间
       for (let i = 0; i < this.daysArr.length; i++) {
         let dateStr =
           this.daysArr[i].year +
@@ -204,123 +195,121 @@ export default {
           this.daysArr[i].month +
           "-" +
           this.daysArr[i].day;
-            this.daysArr[i].id =0;
-       
-        for (let k = 0; k < this.markArr.length; k++) {
-          // var chetrue = this.markArr[k].includes(dateStr);
-          var chetrue = false;
-      //       this.day = date.getDate();
-      // this.month = date.getMonth() + 1;
-      // this.year = date.getFullYear();
-          if (dateStr === this.markArr[k].days) {
-            //  console.log( this.daysArr[i].day,'真')
-            this.daysArr[i].chetrue = true;
-            this.daysArr[i].id = this.markArr[k].id;
-            break;
-          } else {
-            this.daysArr[i].chetrue = false;
-          }
-          // if (chetrue) {
-          //    console.log( this.daysArr[i].day,'真')
-          // } else {
+        this.daysArr[i].id = 0;
 
-          //   console.log( this.daysArr[i].day,'假')
-          // }
+        if (dateStr === daydate) {
+          for (let k = -2; k < 5; k++) {
+            daydaysArr[k + 2] = this.daysArr[i + k];
+          }
         }
       }
+
+      for (let i = 0; i < daydaysArr.length; i++) {
+        let dateStr =
+          daydaysArr[i].year +
+          "-" +
+          daydaysArr[i].month +
+          "-" +
+          daydaysArr[i].day;
+        // daydaysArr[i].id = 0;
+        for (let k = 0; k < this.markArr.length; k++) {
+          // var chetrue = this.markArr[k].includes(dateStr);
+          //    console.log(dateStr)
+
+          var chetrue = false;
+          if (dateStr === this.markArr[k].days) {
+            //  console.log( this.daysArr[i].day,'真')
+            daydaysArr[i].chetrue = true;
+            daydaysArr[i].id = this.markArr[k].id;
+            break;
+          } else {
+            daydaysArr[i].chetrue = false;
+          }
+        }
+      }
+      this.sevenday = daydaysArr;
       //获取下一月总天数
-    }
-  },
-  watch: {
-    month() {
-      if (this.month === 0) {
-        this.month = 12;
-        this.year--;
-      }
-      if (this.month === 13) {
-        this.month = 1;
-        this.year++;
-      }
-      this._getDaysForMonth(this.year, this.month, 1);
-    }
-  },
-  computed: {
-    _CurrentDate() {
-      let date = new Date();
-      let { day, month, year } = {
-        day: date.getDate(),
-        month: date.getMonth() + 1,
-        year: date.getFullYear()
-      };
-      return { day, month, year };
     }
   }
 };
 </script>
-<style rel="stylesheet/scss" lang="scss" scoped>
-#app{
-  background: #f8f8f8;
+<style lang="scss" scoped>
+$fontColor: #fff;
+.desc >>> .iconfont {
+  font-size: 13px;
 }
-
-
-.calender {
-  text-align: center;
-  min-width: 280px;
-  height: 350px;
-  background: #fff;
-}
-.calender-days-wrapper {
+.week {
+  padding: 0.3rem;
+  background: $fontColor;
+  height: 2rem;
   display: flex;
+  flex-direction: column;
+  .week-top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 0.5rem;
+    align-items: center;
+    .title {
+      font-size: 0.3rem;
+      color: black;
+    }
+    .desc {
+      color: #868585;
+    }
+  }
+  .calender-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+        font-weight: 800;
+    .calender-days-wrapper {
+      display: flex;
+      flex-direction: row;
+      height: 0.5rem;
+      align-items: center;
+      width: 100%;
+      .calender-days {
+        width: 14%;
+        text-align: center;
+      }
+      .calender-arrow-item {
+        width: 14%;
+        text-align: center;
+        justify-content: center;
+        display: flex;
+        // background: #c2c9cb;
+        // border-radius: 100%;
+        padding: 0.1rem;
+            margin-right: .1rem;
+        .span {
+          background: red;
+         
+        }
+        .d {
+          background: #4dc862;
+          color: #fff;
+           width: 20px;
+          height: 20px;
+          border-radius: 50px;
+          line-height: 20px;
+        }
+      }
+    }
+    .calender-days {
+      //      display: flex;
+      //   flex-direction: row;
+      width: 100%;
+      .calender-arrow-item {
+        width: 14%;
+        float: left;
+        text-align: center;
+        background: #c2c9cb;
+        border-radius: 100%;
+        padding: 0.1rem;
+      }
+    }
+  }
 }
-.calender-days-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-}
-.calender-days {
-  width: 14%;
-}
-.calender-item-wrapper {
-  width: 14%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.calender-item {
-  border-radius: 100%;
-  width: 0.4rem;
-  height: 0.4rem;
-  line-height: 0.4rem;
-  margin-bottom: 0.3rem;
-  font-weight: 600;
-  font-family: "iconfont";
-}
-.calender-Date-text {
-  font-size: 0.3rem;
-  font-weight: 800;
-}
-.calender-content {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.tem-wrapper {
-  background: red;
-}
-.d {
-  background: #4dc862;
-  color: #fff;
-}
-.no-current-day {
-  visibility: hidden;
-}
-.calender-title {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  height: 1rem;
-  align-items: center;
-  width: 80%;
-  margin: auto;
-}
-
 </style>
+

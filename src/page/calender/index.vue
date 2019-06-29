@@ -49,17 +49,15 @@
 </template>
 
 <script>
-import calender from "./calender";
+import calender from "@cmpt/calender/calender";
 export default {
   name: "App",
   components: {
     calender
     // backwards
   },
-  
   methods: {
     test(item) {
-      console.log(item);
     }
   }
 };
