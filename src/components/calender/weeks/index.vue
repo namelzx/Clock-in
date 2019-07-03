@@ -7,7 +7,6 @@
         <i class="iconfont">&#xe677;</i>
       </div>
     </div>
-
     <div class="calender-content-wrapper">
       <div class="calender-days-wrapper">
         <div class="calender-days">Sun</div>
@@ -20,8 +19,13 @@
       </div>
 
       <div class="calender-days-wrapper">
-        <div class="calender-arrow-item" v-for="(item,index) in  sevenday" :key="index" @click="handelDay(item.id)">
-          <div v-if="item.day==day"  :class="item.chetrue?'d':''">今</div>
+        <div
+          class="calender-arrow-item"
+          v-for="(item,index) in  sevenday"
+          :key="index"
+          @click="handelDay(item.zhuti_id,item.days)"
+        >
+          <div v-if="item.day==day" :class="item.chetrue?'d':''">今</div>
           <div v-else :class="item.chetrue?'d':''">{{item.day}}</div>
         </div>
       </div>
@@ -30,10 +34,10 @@
 </template>
 
 <script>
-import { Toast,InfiniteScroll } from 'mint-ui'
+import { Toast, InfiniteScroll } from "mint-ui";
 export default {
   props: {
-    id:Number,
+    id: String,
     markArr: {
       type: Array,
       default() {
@@ -49,23 +53,42 @@ export default {
       currentDays: "",
       daysArr: [],
       clickItemObj: {},
-      sevenday: []
+      sevenday: [],
+      newdata: []
     };
   },
   mounted() {
     this._getCurrentDate();
   },
-  methods: {
-    tocalender(){
-         this.$router.push({name:'calender',params: {id:this.id}});
 
+  methods: {
+    tocalender() {
+      this.$router.push({
+        path: "/calender",
+        query: {
+          id: this.id
+        }
+      });
     },
-    handelDay(id) {
-      if (id === 0) {
+    handelDay(id, days) {
+      if (id ===undefined) {
         Toast("未签到");
+        return false;
       } else {
-          this.$emit("sendiptVal", id) //传值父组件
-         this.$router.push({name:'detailed',params: {id}});
+        var temp = {
+          id,
+          days
+        };
+        this.$emit("sendiptVal", temp); //传值父组件
+
+        this.$router.push({
+          path: "/detailed",
+          query: {
+            id,
+            days
+          }
+        });
+        // this.$router.push({ name: "detailed", params: { id:25 ,days:3} });
       }
     },
     //点击日期
@@ -118,6 +141,7 @@ export default {
     },
     //获取切换页月份第一天是周几与最后一天并获取月前与月后填补数组
     _getFirstDaysForMonth(year, month) {
+      var that = this;
       let weekdays = new Date(`${year}-${month}-01`).getDay();
 
       let beforeMonthDaysArr = [];
@@ -212,15 +236,13 @@ export default {
           "-" +
           daydaysArr[i].day;
         // daydaysArr[i].id = 0;
-        for (let k = 0; k < this.markArr.length; k++) {
-          // var chetrue = this.markArr[k].includes(dateStr);
-          //    console.log(dateStr)
-
+        for (let k = 0; k < that.markArr.length; k++) {
           var chetrue = false;
-          if (dateStr === this.markArr[k].days) {
-            //  console.log( this.daysArr[i].day,'真')
+          if (dateStr === that.markArr[k].days) {
             daydaysArr[i].chetrue = true;
-            daydaysArr[i].id = this.markArr[k].id;
+            daydaysArr[i].id = that.markArr[k].id;
+            daydaysArr[i].zhuti_id = that.markArr[k].zhuti_id;
+            daydaysArr[i].days = that.markArr[k].days;
             break;
           } else {
             daydaysArr[i].chetrue = false;
@@ -230,6 +252,13 @@ export default {
       this.sevenday = daydaysArr;
       //获取下一月总天数
     }
+  },
+  watch: {
+    markArr(newValue, oldValue) {
+      this.newdata = newValue;
+      this._getCurrentDate();
+    },
+    deep: true
   }
 };
 </script>
@@ -262,7 +291,7 @@ $fontColor: #fff;
     display: flex;
     flex-direction: column;
     justify-content: center;
-        font-weight: 800;
+    font-weight: 800;
     .calender-days-wrapper {
       display: flex;
       flex-direction: row;
@@ -281,15 +310,14 @@ $fontColor: #fff;
         // background: #c2c9cb;
         // border-radius: 100%;
         padding: 0.1rem;
-            margin-right: .1rem;
+        margin-right: 0.1rem;
         .span {
           background: red;
-         
         }
         .d {
           background: #4dc862;
           color: #fff;
-           width: 20px;
+          width: 20px;
           height: 20px;
           border-radius: 50px;
           line-height: 20px;

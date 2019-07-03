@@ -1,11 +1,12 @@
 <template>
   <div class="card">
     <div class="card-top">
-      <div class="title">签到日历</div>
+      <div class="title">签到主题</div>
     </div>
 
     <div class="calender-content-wrapper">
-      <span>今天没有主题哦，可以自行输入签到内容</span>
+      <span v-if="desc"> {{desc}}</span>
+      <span v-else>没有主题哦，可以自行输入签到内容</span>
     </div>
   </div>
 </template>
@@ -13,12 +14,20 @@
 <script>
 export default {
   props: {
+    desc:String,
     markArr: {
       type: Array,
       default() {
         return [];
       }
     }
+  },
+  watch: {
+    desc(newValue, oldValue) {
+      console.log(newValue)
+    },
+   
+    deep: true
   }
 };
 </script>

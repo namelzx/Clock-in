@@ -7,11 +7,11 @@
     <div class="list" >
       <div class="list-items" v-for="(item,index) in MyList" :key="index" @click="handelUrl(item.id)">
         <div class="list-tx">
-          <img :src="item.tx">
+          <img :src="item.imaes_url">
         </div>
         <div class="lsit-desc">
           <div class="title">{{item.title}}</div>
-          <div class="desc">{{item.desc}}</div>
+          <div class="desc">{{item.get_sign_count.length}}人参与|{{item.get_sign.length}}打卡</div>
         </div>
         <div class="arr">
           <i class="iconfont">&#xe617;</i>
@@ -46,14 +46,18 @@ export default {
   },
   methods:{
     handelUrl(id){
-      this.$router.push({name:'detailed',params: {id}});
-
+         this.$router.push({
+                    path: '/detailed',
+                    query: {
+                        id,
+                    }
+                })
     }
   }
 };
 </script>
 <style lang="scss" scoped>
-$fontColor: #868585;
+$fontColor: #b1aeae;
 $background: #fff;
 $backgroundconent: #f6f6f6;
 .iconfont {
@@ -109,8 +113,8 @@ $backgroundconent: #f6f6f6;
       // font-weight: 800;
       .desc {
         color: $fontColor;
-        font-weight: 500;
-        font-size: 0.2rem;
+        font-weight: 400;
+        font-size: 0.23rem;
       }
     }
   }

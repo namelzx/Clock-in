@@ -3,35 +3,52 @@
     <div class="sign-top">
       <div class="title">{{title}}</div>
     </div>
-
     <div class="calender-content-wrapper">
       <div class="header-top">
         <div class="images">
-          <img :src="detailes.tx">
+          <img :src="userInfo.avatar" />
         </div>
         <div class="desc">
-          <div class="title">J-R梁泽祥</div>
-          <div class="info">已签到3天，连续签到3天</div>
+          <div class="title">{{userInfo.nickname}}</div>
+          <div class="info">已签到{{sum}}天，连续签到{{continuousday}}天</div>
         </div>
       </div>
     </div>
     <div class="list" v-for="(item,index) in list" :key="index">
-      <div class="list-items" >
-        <div class="items-header">
-          <div class="day">{{item.day}}</div>
-          <div class="time">{{item.daytime}}</div>
+      <div class="ico">
+        <div style="height:11px">
+          <img src="../../assets/images/ico.png" />
         </div>
-        <div class="items-desc">{{item.desc}}</div>
+        <div class="xt">&nbsp; </div>
+      </div>
+      <div class="list-items">
+        <div class="items-header">
+          <div class="day">{{item.create_time}}</div>
+        </div>
+
+        <div class="items-desc">
+        <audio ref="player" v-if="item.voice_url" :src="item.voice_url" controls></audio>
+          
+         <div> {{item.desc}}</div>
+         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
 export default {
   props: {
+    headimgurl: String,
     title: String,
+    continuousday: Number,
+    sum: Number,
+    userInfo: {
+      type: Object,
+      default() {
+        return {};
+      }
+    },
     list: {
       type: Array,
       default() {
@@ -39,15 +56,22 @@ export default {
       }
     }
   },
-  
+
   data() {
     return {
-     
       detailes: {
         tx:
           "https://img.zcool.cn/community/011cff5c7e3893a801213f26f4fed1.jpg@1280w_1l_2o_100sh.jpg"
       }
     };
+  },
+  watch: {
+    list(newValue, oldValue) {
+      this.newdata = newValue;
+    },
+    sum(newValue, oldValue) {},
+    userInfo(newValue, oldValue) {},
+    deep: true
   }
 };
 </script>
@@ -84,7 +108,7 @@ $fontColor: #fff;
     // padding-top: 0.2rem;
     padding-left: 0.2rem;
     color: #fff;
-    
+
     // align-items: center;
     img {
       width: 1rem;
@@ -116,7 +140,8 @@ $fontColor: #fff;
     justify-content: center;
     font-weight: 800;
     color: #868585;
-        border-bottom: 1px dashed #d0caca;
+    border-bottom: 1px dashed #d0caca;
+    margin-bottom: .25rem;
     .calender-days-wrapper {
       display: flex;
       flex-direction: row;
@@ -151,30 +176,48 @@ $fontColor: #fff;
     }
   }
   .list {
-      margin-top:.2rem;
+    // margin-top: 0.2rem;
     padding-left: 0.2rem;
     font-size: 0.25rem;
     font-weight: 500;
     color: #868585;
+    display: flex;
+    flex-direction: row;
+    .ico {
+      display: flex;
+      flex-direction: column;
+      img {
+        width: 14px;
+      }
+      .xt{
+        border-left: 1px solid #edece8;
+        margin-left: 6px;
+        height: 100%;
+      }
+    }
     .list-items {
+      padding-left: .25rem;
       .items-header {
         display: flex;
         flex-direction: row;
-        .day{
-            padding-right: .4rem;
+        .day {
+          padding-right: 0.4rem;
         }
       }
-      .items-desc{
-          height: 1rem;
-          display: flex;
-            flex-direction: column;
-          justify-content:center;
-          color: black;
-          font-weight: 400;
+      .items-desc {
+        // height: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: black;
+        font-weight: 400;
+        padding-top: 16px;
+    padding-bottom: 30px;
+    font-size: .25rem;
+    text-indent: 20px;
       }
     }
   }
 }
-
 </style>
 

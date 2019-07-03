@@ -1,6 +1,5 @@
 <template>
   <div class="calender">
-  
     <div class="calender-title-wrapper">
       <div class="calender-title">
         <div class="calender-arrow-item left2" v-if="false"></div>
@@ -36,7 +35,7 @@
                                item.year===_CurrentDate.year}"
           @click="_clickDaysItem(item)"
         >
-          <div class="calender-item" :class="item.chetrue?'d':''" @click="handelDay(item.id)">
+          <div class="calender-item" :class="item.chetrue?'d':''" @click="handelDay(item.zhuti_id,item.days)">
             <span v-if="item.day==day">今</span>
             <span v-else>{{item.day}}</span>
           </div>
@@ -47,13 +46,13 @@
           <span class="tem" :style="{background:item.color}"></span>
           <span class="text">{{item.name}}</span>
         </div>
-      </div> -->
+      </div>-->
     </div>
   </div>
 </template>
 
 <script>
-import { Toast,InfiniteScroll } from 'mint-ui'
+import { Toast, InfiniteScroll } from "mint-ui";
 
 export default {
   name: "calender",
@@ -80,12 +79,19 @@ export default {
   },
   created() {},
   methods: {
-    handelDay(id) {
-      if(id===0){
-      Toast('未签到');
-      }else{
-        this.$router.push({name:'detailed',params: {id:id}});
-         Toast('今日已签到');
+    handelDay(id,days) {
+      if (id === 0) {
+        Toast("未签到");
+      } else {
+        // this.$router.push({ name: "detailed", params: { id: id } });
+        // Toast("今日已签到");
+         this.$router.push({
+          path: "/detailed",
+          query: {
+            id,
+            days
+          }
+        });
       }
     },
     //点击日期
@@ -112,7 +118,7 @@ export default {
             `${item.year}-${item.month}-${item.day}`
           )
         ) {
-          this.$emit(this.markArr[i].clickEvent, item);
+          // this.$emit(this.markArr[i].clickEvent, item);
         }
       }
     },
@@ -204,18 +210,20 @@ export default {
           this.daysArr[i].month +
           "-" +
           this.daysArr[i].day;
-            this.daysArr[i].id =0;
-       
+        this.daysArr[i].id = 0;
+
         for (let k = 0; k < this.markArr.length; k++) {
           // var chetrue = this.markArr[k].includes(dateStr);
           var chetrue = false;
-      //       this.day = date.getDate();
-      // this.month = date.getMonth() + 1;
-      // this.year = date.getFullYear();
+          //       this.day = date.getDate();
+          // this.month = date.getMonth() + 1;
+          // this.year = date.getFullYear();
           if (dateStr === this.markArr[k].days) {
             //  console.log( this.daysArr[i].day,'真')
             this.daysArr[i].chetrue = true;
             this.daysArr[i].id = this.markArr[k].id;
+            this.daysArr[i].zhuti_id = this.markArr[k].zhuti_id;
+            this.daysArr[i].days = this.markArr[k].days;
             break;
           } else {
             this.daysArr[i].chetrue = false;
@@ -232,6 +240,10 @@ export default {
     }
   },
   watch: {
+    markArr(newValue, oldValue) {
+      this._getCurrentDate();
+    },
+    deep: true,
     month() {
       if (this.month === 0) {
         this.month = 12;
@@ -258,10 +270,9 @@ export default {
 };
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
-#app{
+#app {
   background: #f8f8f8;
 }
-
 
 .calender {
   text-align: center;
@@ -322,5 +333,4 @@ export default {
   width: 80%;
   margin: auto;
 }
-
 </style>

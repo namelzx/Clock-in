@@ -32,7 +32,9 @@ module.exports = {
       '@style' : resolve('src/assets/styles'),
       '@script': resolve('src/assets/scripts'),
       '@util': resolve('src/util'),
-      '@api': resolve('src/api')
+      '@api': resolve('src/api'),
+      '@store': resolve('src/store'),
+      '@images': resolve('static/images')
     }
   },
   module: {
