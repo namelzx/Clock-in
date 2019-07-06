@@ -5,7 +5,75 @@
   <meta charset="utf-8">
   <meta name="viewport"
     content="width=device-width,initial-scale=1,user-scalable=0,minimum-scale=1.0,maximum-scale=1.0">
-  <title>轻打卡</title>
+  <title> 小晨读+</title>
+
+
+  <style>
+    #Loading {
+      top: 50%;
+      left: 50%;
+      height: 100%;
+      width: 100%;
+      text-align: center;
+      position: absolute;
+      background: #fff;
+      -webkit-transform: translateY(-50%) translateX(-50%);
+      transform: translateY(-50%) translateX(-50%);
+      z-index: 100;
+    }
+    .loader-inner{
+      margin-top: 50%;
+
+    }
+
+    @-webkit-keyframes ball-beat {
+      50% {
+        opacity: 0.2;
+
+        -webkit-transform: scale(0.75);
+        transform: scale(0.75);
+      }
+      100% {
+        opacity: 1;
+
+        -webkit-transform: scale(1);
+        transform: scale(1);
+      }
+    }
+    @keyframes ball-beat {
+      50% {
+        opacity: 0.2;
+
+        -webkit-transform: scale(0.75);
+        transform: scale(0.75);
+      }
+      100% {
+        opacity: 1;
+        -webkit-transform: scale(1);
+        transform: scale(1);
+      }
+    }
+    .ball-beat > div {
+      background-color: #279fcf;
+      width: 10px;
+      height: 10px;
+
+      border-radius: 100% !important;
+      margin: 2px;
+
+      -webkit-animation-fill-mode: both;
+      animation-fill-mode: both;
+      display: inline-block;
+      -webkit-animation: ball-beat 0.7s 0s infinite linear;
+      animation: ball-beat 0.7s 0s infinite linear;
+    }
+    .ball-beat > div:nth-child(2n-1) {
+      -webkit-animation-delay: 0.35s !important;
+
+      animation-delay: 0.35s !important;
+    }
+  </style>
+
   <style>
     html,
     body {
@@ -18,12 +86,12 @@
 
     @font-face {
   font-family: 'iconfont';  /* project id 777975 */
-  src: url('//at.alicdn.com/t/font_777975_4fkfxmukgz7.eot');
-  src: url('//at.alicdn.com/t/font_777975_4fkfxmukgz7.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_777975_4fkfxmukgz7.woff2') format('woff2'),
-  url('//at.alicdn.com/t/font_777975_4fkfxmukgz7.woff') format('woff'),
-  url('//at.alicdn.com/t/font_777975_4fkfxmukgz7.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_777975_4fkfxmukgz7.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_777975_vhuke4giqs.eot');
+  src: url('//at.alicdn.com/t/font_777975_vhuke4giqs.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_777975_vhuke4giqs.woff2') format('woff2'),
+  url('//at.alicdn.com/t/font_777975_vhuke4giqs.woff') format('woff'),
+  url('//at.alicdn.com/t/font_777975_vhuke4giqs.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_777975_vhuke4giqs.svg#iconfont') format('svg');
 }
 
     .iconfont {
@@ -40,6 +108,13 @@
 </head>
 
 <body>
+    <div id="Loading" >
+        <div class="loader-inner ball-beat">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
   <div id="app"></div>
   <!-- built files will be auto injected -->
   <script
@@ -51,4 +126,7 @@
   })(750)
 </script>
 
+
+    
+    
 </html>

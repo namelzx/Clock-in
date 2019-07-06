@@ -1,14 +1,14 @@
 <template>
-  <div v-show="show">
-    <div class="detailed">
+  <div>
+    <div class="detailed" >
       <header :style="back">
         <div class="header-top">
           <div class="images">
-            <img :src="detailes.tx" />
+            <img :src="detailed.ico" />
           </div>
           <div class="desc">
             <div class="title">{{detailed.title}}</div>
-            <div class="info">1282人参与|5196人打卡</div>
+            <div class="info">{{sumZhuti}}人参与 | {{sumsign}}人打卡</div>
             <div class="info-desc">{{detailed.desc}}</div>
           </div>
         </div>
@@ -23,8 +23,10 @@
         :continuousday="continuousday"
       ></sign>
     </div>
-    <div class="btn" @click="toUrl">签到</div>
-    <div class="tdbtn" @click="UnsuDelete">退订</div>
+    <div class=" tdbtn" @click="toUrl">签到</div>
+
+    <div class="btn" @click="UnsuDelete">退订</div>
+
   </div>
 </template>
 
@@ -36,10 +38,12 @@ import card from "@cmpt/card";
 import sign from "@cmpt/sign";
 
 import { GetIdBydetailed, GetIdByUnsuDelete } from "@api/colck";
-import { mapGetters } from "vuex";
 import { Toast } from "vant";
 import { getDataByUser } from "@api/user";
 
+import wx from "weixin-js-sdk";
+import { getJssdk } from "@api/user";
+const _this = wx;
 export default {
   components: {
     weeks,
@@ -48,7 +52,7 @@ export default {
   },
   data() {
     return {
-      show:false,
+      show: false,
       id: 0,
       desc: "111",
       detailed: {},
@@ -64,6 +68,8 @@ export default {
       markArr: [],
       markAll: [],
       fullPath: "",
+      sumsign:0,
+      sumZhuti:0,
       detailes: {
         tx:
           "https://img.zcool.cn/community/011cff5c7e3893a801213f26f4fed1.jpg@1280w_1l_2o_100sh.jpg"
@@ -73,23 +79,99 @@ export default {
     };
   },
   created() {
+    console.log( this.$store.state.user_id)
+
+
+    let url =
+      "http://clock.10huisp.com/dist/#" +
+      this.$route.path +
+      "?id=" +
+      this.$route.query.id;
     this.fullPath = location.href;
-    this.userInfo = this.$store.state.userInfo;
-    Toast.loading({
-      mask: true,
-      message: "加载中..."
+
+    if (
+      this.$route.query.user_id === undefined &&
+      this.$store.state.user_id === 0
+    ) {
+      this.fullPath =
+        this.$store.state.url+"/dist/#" +
+        this.$route.path +
+        "?id=" +
+        this.$route.query.id;
+    }
+    if (
+      this.$route.query.id !== undefined &&
+      this.$route.query.user_id === undefined &&
+      this.$store.state.user_id === 0
+    ) {
+      this.fullPath =
+        this.$store.state.url+"/dist/#" +
+        this.$route.path +
+        "?id=" +
+        this.$route.query.id;
+    }
+
+
+    this.getData();
+    getJssdk(this.fullPath).then(res => {
+      // console.log(res)
+      let list = res.data;
+      _this.config({
+        appId: list.appId, // 必填，公众号的唯一标识
+        timestamp: list.timestamp, // 必填，生成签名的时间戳
+        nonceStr: list.nonceStr, // 必填，生成签名的随机串
+        signature: list.signature, // 必填，签名
+        jsApiList: [
+          "startRecord",
+          "translateVoice",
+          "stopRecord",
+          "playVoice",
+          "pauseVoice",
+          "stopVoice",
+          "uploadVoice",
+          "downloadVoice",
+          "downloadVoice",
+          "onMenuShareTimeline",
+          "onMenuShareAppMessage"
+        ] // 必填，需要使用的JS接口列表
+        // 接口 开始录音接口 停止录音接口 播放语音接口 暂停播放接口 停止播放接口 上传语音接口 下载语音接口 识别音频并返回识别结果接口
+      });
+      // config信息验证后才执行
+      _this.ready(() => {});
+      _this.onMenuShareTimeline({
+        title: "现在我这个是分享到朋友圈1", // 分享标题
+        desc: "我这个就是一个简单的分享朋友圈描述", //分享描述
+        link: url, // 分享链接
+        imgUrl: "https://pwmapi.oss-cn-beijing.aliyuncs.com/bj.jpeg" // 图片
+      });
+      wx.onMenuShareAppMessage({
+        title: "我觉得我这个是分享到好友", // 分享标题
+        desc: "我这个就是一个简单的分享好友描述", //分享描述
+        link: url,
+        imgUrl: "https://pwmapi.oss-cn-beijing.aliyuncs.com/bj.jpeg", // 图片
+        success() {
+          opstion.success();
+        },
+        cancel() {
+          opstion.error();
+        }
+      });
+
     });
+
+    this.userInfo = this.$store.state.userInfo;
+
     // console.log()
     this.id = this.$route.query.id;
     this.temp.id = this.id;
     if (this.$route.query.days) {
       this.temp.days = this.$route.query.days;
     }
-    this.getData();
   },
 
   methods: {
     getData() {
+      var that=this;
       this.temp.user_id = this.$store.state.user_id;
       if (this.$route.query.user_id > 0) {
         getDataByUser(this.$route.query.user_id).then(res => {
@@ -97,17 +179,23 @@ export default {
           this.$store.state.user_id = res.data.id;
           this.userInfo = res.data;
         });
-         this.temp.user_id =this.$route.query.user_id;
+        this.temp.user_id = this.$route.query.user_id;
       }
       GetIdBydetailed(this.temp).then(res => {
         this.detailed = res.data.data;
+        if(this.detailed.images_url!==undefined){
+          this.back='background: url('+this.detailed.images_url+') no-repeat;    background-size:100%100%;\n'
+        }
         this.markArr = res.data.data.get_sign;
         this.markAll = res.data.data.get_signall;
         this.sum = res.data.sum;
+        this.sumsign=res.data.sumsign;
+        this.sumZhuti=res.data.sumZhuti;
         this.desc = this.detailed.desc;
         this.continuousday = res.data.continuousday;
-        this.show=true;
+
         Toast.clear();
+
       });
     },
     showChildMsg(temp) {

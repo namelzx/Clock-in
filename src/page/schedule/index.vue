@@ -4,7 +4,7 @@
       <div class="list-items">
         <div>开启学习提醒</div>
         <div class="switch">
-          <van-switch v-model="temp.checked" />
+          <van-switch v-model="temp.checked" @change="getpost" />
         </div>
       </div>
       <div class="list-items" @click="show=true">
@@ -101,6 +101,9 @@ export default {
     this.getScheduleData();
   },
   methods: {
+      getpost(){
+          this.postData();
+      },
     getScheduleData() {
       getSchedule(this.temp.user_id).then(res => {
         if (res.data.temp.checked === 1) {

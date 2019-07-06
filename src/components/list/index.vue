@@ -4,10 +4,15 @@
       <i class="iconfont">{{iconfont}}</i>
       {{mytitle}}
     </div>
-    <div class="list" >
-      <div class="list-items" v-for="(item,index) in MyList" :key="index" @click="handelUrl(item.id)">
+    <div class="list">
+      <div
+        class="list-items"
+        v-for="(item,index) in MyList"
+        :key="index"
+        @click="handelUrl(item.id)"
+      >
         <div class="list-tx">
-          <img :src="item.imaes_url">
+          <img :src="item.ico" />
         </div>
         <div class="lsit-desc">
           <div class="title">{{item.title}}</div>
@@ -44,14 +49,14 @@ export default {
       }
     };
   },
-  methods:{
-    handelUrl(id){
-         this.$router.push({
-                    path: '/detailed',
-                    query: {
-                        id,
-                    }
-                })
+  methods: {
+    handelUrl(id) {
+      this.$router.push({
+        path: "/detailed",
+        query: {
+          id
+        }
+      });
     }
   }
 };
@@ -102,8 +107,10 @@ $backgroundconent: #f6f6f6;
       img {
         margin-right: 0.3rem;
         width: 1rem;
+        height: 1rem;
         border-radius: 100%;
         margin-left: 0.2rem;
+
       }
     }
     .lsit-desc {

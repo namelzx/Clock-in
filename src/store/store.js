@@ -8,6 +8,7 @@ const store=new Vuex.Store({
         author:'测试',
         isLogin:false,
         user_id:0,
+      url:"http://daka.xiaochendu.com",
         userInfo:{
             headimgurl:"https://img.zcool.cn/community/011cff5c7e3893a801213f26f4fed1.jpg@1280w_1l_2o_100sh.jpg",
             username:"J-R梁泽祥",
