@@ -48,6 +48,12 @@
       }
       GetIdBydetailed(temp).then(res => {
         this.temp = res.data
+        if(res.data.data.get_sules.length<1){
+          this.fm='http://daka.xiaochendu.com/uploads/20190706/20c11258e303a8de3b0dd2f4e59a4fc5.jpeg';
+          this.ci='骐骥一跃，不能十步;驽马十驾，功在不舍。坚持是一种信仰! ';
+          this.drawCanvasBgImg();
+          return false
+        }
         var sules = res.data.data.get_sules
         for (let i = 0; i < sules.length; i++) {
           if (sules[i].day == this.temp.sum) {

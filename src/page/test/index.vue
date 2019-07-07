@@ -1,8 +1,25 @@
 <template>
-  <div>
-    <div>
-      每日跟读金句
+  <div class="main">
+    <div class="head-sign" v-if="sign">
+      <div class="head-title">每日金句跟读</div>
+       <div class="head-main">
+         <div class="list-items" v-show="detail.data.get_voice">
+            <div class="ico">
+              <img :src="detail.data.ico">
+            </div>
+           <div class="yy"> <audio ref="player"  :src="voiceurl" controls></audio></div>
+         </div>
+         <div class="list-items" v-show="detail.data.theme">
+           <div class="ico">
+             <img :src="detail.data.ico">
+           </div>
+           <div class="yy msdesc" v-html="detail.data.theme">
+
+           </div>
+         </div>
+       </div>
     </div>
+
     <div class="add">
       <div class="hello">
       <div class="hello-desc">
@@ -63,6 +80,9 @@
     name: "HelloWorld",
     data() {
       return {
+        voiceurl:'',
+        desc:"驽马十驾，功在不舍。\n" +
+          "坚持是一种信仰! .",
         show: false,
         localId: "",
         serverId: "",
@@ -75,10 +95,12 @@
         temp: {
           desc: "",
         },
+        sign:false,
         id: 0,
+        detail:{},
+        dedd:"",
         tempdata: {
           sum: 0,
-
         }
       };
     },
@@ -140,6 +162,21 @@
       });
 
       this.id = this.$route.params.id;
+
+      var tmep = {
+        id: this.id,
+        user_id: this.$store.state.user_id
+      }
+      GetIdBydetailed(tmep).then(res => {
+        this.detail = res.data
+
+        var temp=res.data.data
+
+        if(temp.get_voice!==undefined&&temp.theme!==undefined){
+          this.sign=true
+          this.voiceurl=temp.get_voice.url
+        }
+      })
 
     },
     methods: {
@@ -392,10 +429,52 @@
   $color: #39bafc;
   $fontSize: 0.25rem;
   $typecolor: #e4e1e1;
+.main{
+  background: #fafafa;
+}
 
+  .head-sign{
+    display: flex;
+    flex-direction: column;
+    padding: 0.3rem;
+    background: #fff;
+    margin-bottom: 10px;
+    .head-title{
+      color: $color;
+    }
+    .head-main {
+      padding: 0.3rem;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      .list-items {
+        display: flex;
+        flex-direction: row;
+        margin-top: 10px;
+        .ico{
+          margin-right: .3rem;
+
+        }
+        .msdesc{
+          border: 1px solid #aaa;
+          border-radius: 3px;
+          padding: 10px;
+          width: 100%;
+        }
+        img {
+          width: 40px;
+          height: 40px;
+          border-radius: 100%;
+        }
+      }
+    }
+
+
+  }
   .add {
     background: $background;
-    margin: 0.3rem;
+    padding: 0.3rem;
+
 
     .hello {
       display: flex;

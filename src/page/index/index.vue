@@ -71,7 +71,10 @@ export default {
       getDataByUser(this.$route.query.user_id).then(res => {
         this.$store.state.userInfo = res.data;
         this.$store.state.user_id = res.data.id;
+        this.admin =  res.data.admin;
+
       });
+
     }
     if (this.$store.state.user_id !== undefined) {
       this.show = true;
@@ -79,7 +82,6 @@ export default {
     }
 
     getJssdk(this.fullPath).then(res => {
-      // console.log(res)
       let list = res.data;
 
       _this.config({
@@ -126,6 +128,8 @@ export default {
         }
       });
     });
+
+    this.admin= this.$store.state.userInfo.admin
   },
   methods: {
     toAdd() {
