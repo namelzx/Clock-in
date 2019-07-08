@@ -11,6 +11,7 @@
         :key="index"
         @click="handelUrl(item.id)"
       >
+
         <div class="list-tx">
           <img :src="item.ico" />
         </div>
@@ -115,13 +116,13 @@ $backgroundconent: #f6f6f6;
     }
     .lsit-desc {
       color: black;
-      font-size: 0.3rem;
+      font-size: 0.34rem;
       width: 80%;
       // font-weight: 800;
       .desc {
         color: $fontColor;
         font-weight: 400;
-        font-size: 0.23rem;
+        font-size: 0.25rem;
       }
     }
   }

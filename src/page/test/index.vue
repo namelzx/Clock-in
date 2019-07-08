@@ -1,43 +1,49 @@
 <template>
   <div class="main">
     <div class="head-sign" v-if="sign">
-      <div class="head-title">每日金句跟读</div>
-       <div class="head-main">
-         <div class="list-items" v-show="detail.data.get_voice">
-            <div class="ico">
-              <img :src="detail.data.ico">
+      <div class="head-title">今日领读精要</div>
+      <div class="head-main">
+        <div class="list-items" v-show="detail.data.get_voice">
+          <div class="ico">
+            <img :src="detail.data.ico">
+          </div>
+          <div class="yy">
+            <audio :src="voiceurl" controls></audio>
+            <span>{{detail.data.get_voice.time_len}}</span>
+          </div>
+        </div>
+        <div class="list-items" v-show="detail.data.zhuti_desc">
+          <div class="ico">
+            <img :src="detail.data.ico">
+
+          </div>
+
+          <div class="bodyFont clearfloat" id="bodyFont" ref="bodyFont" :class="{bodyHeight:contentStatus}">
+            <div class="yy msdesc" v-html="detail.data.zhuti_desc">
             </div>
-           <div class="yy"> <audio ref="player"  :src="voiceurl" controls></audio></div>
-         </div>
-         <div class="list-items" v-show="detail.data.theme">
-           <div class="ico">
-             <img :src="detail.data.ico">
-           </div>
-           <div class="yy msdesc" v-html="detail.data.theme">
+          </div>
 
-           </div>
-         </div>
-       </div>
+        </div>
+      </div>
     </div>
-
     <div class="add">
       <div class="hello">
-      <div class="hello-desc">
-        <img v-if="starttitle==='开始录音'" @click="start" src="../../assets/images/start.png"/>
-        <img v-if="starttitle==='结束录音'" @click="start" src="../../assets/images/for.png"/>
-        <img v-if="starttitle==='开始播放'" @click="start" src="../../assets/images/suspen.png"/>
-        <img v-if="starttitle==='结束播放'" @click="start" src="../../assets/images/play.png"/>
-        <div style="display: flex;
+        <div class="hello-desc">
+          <img v-if="starttitle==='开始录音'" @click="start" src="../../assets/images/start.png"/>
+          <img v-if="starttitle==='结束录音'" @click="start" src="../../assets/images/for.png"/>
+          <img v-if="starttitle==='开始播放'" @click="start" src="../../assets/images/suspen.png"/>
+          <img v-if="starttitle==='结束播放'" @click="start" src="../../assets/images/play.png"/>
+          <div style="display: flex;
     flex-direction: column;
     justify-content: center;
     margin-left: .2rem;">
-          <p>录音时间:{{time}}</p>
-          <p>点击左侧按钮,{{starttitle}}</p>
+            <p>录音时间:{{time}}</p>
+            <p>点击左侧按钮,{{starttitle}}</p>
+          </div>
+          <div class="list" style="display: none;">
+            <audio ref="player" id="audio" src controls></audio>
+          </div>
         </div>
-        <div class="list" style="display: none;">
-          <audio ref="player" id="audio" src controls></audio>
-        </div>
-      </div>
 
         <div class="btndd" @click="again" v-if='starttitle=="开始播放"'>重新录音</div>
         <div class="btndd" @click="again" v-if='starttitle=="结束播放"'>重新录音</div>
@@ -45,13 +51,16 @@
 
       </div>
       <div class="add-items">
-        <div class="title">签到活动说明</div>
+        <div class="dtitle">签到活动说明</div>
         <div class="input">
           <textarea v-model="temp.desc" placeholder="写点什么吧～ (500字以内)"></textarea>
         </div>
       </div>
       <div class="btn" @click="handelPost">提交活动</div>
     </div>
+
+    <div  class="hide-article-box" v-if="contentStatus" @click="contentStatus=!contentStatus">阅读全文</div>
+
     <div class="show">
       <van-popup v-model="show">
         <div class="ico">
@@ -74,14 +83,25 @@
   import {postmateial} from "@api/material";
 
   import {GetIdBydetailed} from "@api/colck";
+  import {quillEditor} from 'vue-quill-editor'
 
   const _this = wx;
   export default {
     name: "HelloWorld",
     data() {
       return {
-        voiceurl:'',
-        desc:"驽马十驾，功在不舍。\n" +
+        contentStatus:false,
+        curHeight:0,
+        bodyHeight:100,
+        content: '',
+        editorOption: {
+          modules: {
+            toolbar: 'title'
+          },
+        },
+
+        voiceurl: '',
+        desc: "驽马十驾，功在不舍。\n" +
           "坚持是一种信仰! .",
         show: false,
         localId: "",
@@ -94,15 +114,23 @@
         audioPlayShow: true,
         temp: {
           desc: "",
+          voice_url: "",
+          time_len: 0,
         },
-        sign:false,
+        sign: false,
         id: 0,
-        detail:{},
-        dedd:"",
+        detail: {},
+        dedd: "",
         tempdata: {
           sum: 0,
         }
       };
+    },
+
+    mounted(){
+      setTimeout(()=>{
+        this.contentToggle();
+      },500)
     },
     created() {
       let url =
@@ -170,16 +198,36 @@
       GetIdBydetailed(tmep).then(res => {
         this.detail = res.data
 
-        var temp=res.data.data
+        var temp = res.data.data
 
-        if(temp.get_voice!==undefined&&temp.theme!==undefined){
-          this.sign=true
-          this.voiceurl=temp.get_voice.url
+        if (temp.get_voice !== undefined && temp.theme !== undefined) {
+          this.sign = true
+          this.voiceurl = temp.get_voice.url
         }
       })
 
     },
     methods: {
+      contentToggle(){
+        this.curHeight=this.$refs.bodyFont.offsetHeight;
+        console.log(this.curHeight)
+        if(this.curHeight>this.bodyHeight){
+
+          this.contentStatus=true;
+        }else{
+          this.contentStatus=false;
+        }
+      },
+
+      onEditorBlur(editor) {//失去焦点事件
+      },
+      onEditorFocus(editor) {//获得焦点事件
+      },
+      onEditorChange({editor, html, text}) {//编辑器文本发生变化
+        //this.content可以实时获取到当前编辑器内的文本内容
+        console.log(this.content);
+      },
+
       toPosters() {
         var that = this;
         that.$router.push({
@@ -205,7 +253,6 @@
           return false;
         }
         PostDataByAdd(this.temp).then(res => {
-          // Toast(res.data.msg);
           var tmep = {
             id: this.id,
             user_id: this.$store.state.user_id
@@ -284,14 +331,14 @@
         });
       },
       //重新录音
-      again(){
+      again() {
         let that = this;
         this.starttitle = "开始录音";
         _this.stopRecord({
           success: function (res) {
             clearInterval(that.timer);
             that.localId = res.localId;
-            that.time=0;
+            that.time = 0;
           },
           fail: function (error) {
             // alert('死啦停不了')
@@ -378,6 +425,7 @@
             postmateial(tmep).then(res => {
               that.$refs.player.src = res.data;
               that.temp.voice_url = res.data;
+              that.temp.time_len = that.time;
             });
           }
         });
@@ -429,38 +477,55 @@
   $color: #39bafc;
   $fontSize: 0.25rem;
   $typecolor: #e4e1e1;
-.main{
-  background: #fafafa;
-}
+  .input > > > .quill-editor {
+    height: 3rem;
+    border-radius: 10px;
 
-  .head-sign{
+    .ql-container {
+      border-radius: 10px;
+    }
+  }
+
+  .main {
+    background: #fafafa;
+  }
+
+  .head-sign {
     display: flex;
     flex-direction: column;
     padding: 0.3rem;
     background: #fff;
     margin-bottom: 10px;
-    .head-title{
+
+    .head-title {
       color: $color;
     }
+
     .head-main {
       padding: 0.3rem;
       display: flex;
       flex-direction: column;
       background: #fff;
+
       .list-items {
         display: flex;
         flex-direction: row;
         margin-top: 10px;
-        .ico{
+
+        .ico {
           margin-right: .3rem;
 
         }
-        .msdesc{
+
+        .msdesc {
           border: 1px solid #aaa;
           border-radius: 3px;
           padding: 10px;
           width: 100%;
+          height: 100%;
+          overflow: hidden;
         }
+
         img {
           width: 40px;
           height: 40px;
@@ -471,6 +536,7 @@
 
 
   }
+
   .add {
     background: $background;
     padding: 0.3rem;
@@ -481,12 +547,14 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      .hello-desc{
+
+      .hello-desc {
         display: flex;
         flex-direction: row;
       }
-      .btndd{
-        border:1px solid #39bafc;
+
+      .btndd {
+        border: 1px solid #39bafc;
         border-radius: 30px;
         padding: 2px;
         padding-left: 10px;
@@ -506,9 +574,9 @@
       flex-direction: column;
       color: $color;
       font-size: $fontSize;
-      margin-bottom: 0.4rem;
+      padding-bottom: 4rem;
 
-      .title {
+      .dtitle {
         margin-bottom: 0.1rem;
       }
 
@@ -526,6 +594,8 @@
         height: 1.5rem;
         border: 1px solid $typecolor;
         border-radius: 0.1rem;
+        padding-top: 0.2rem;
+        font-size: 0.3rem;
       }
 
       ::-webkit-input-placeholder {
@@ -597,6 +667,32 @@
       font-weight: 800;
       border-radius: 1rem;
     }
+  }
+
+  .bodyHeight{
+    height:100px;
+  }
+  .contentToggle{
+    height:10px;
+    line-height:10px;
+    text-align: center;
+    color:red;
+    /*border:1px solid red;*/
+    border-radius: 5px;
+    margin-bottom:30px;
+  }
+  .hide-article-box{
+    position: absolute;
+    top: 206px;
+    width: 70%;
+    text-align: center;
+    background: #fff;
+    margin-left: 25%;
+  }
+  .yy{
+    display: flex;
+    align-items: center;
+    width: 60px;
   }
 </style>
 

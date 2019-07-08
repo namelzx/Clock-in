@@ -14,7 +14,7 @@
         </div>
       </header>
       <weeks :markArr="markAll" :id="id" @sendiptVal="showChildMsg"></weeks>
-      <card :desc="desc"></card>
+      <card :desc="detailed.zhuti_desc" :voice="detailed.get_voice"></card>
       <sign
         :title="sign"
         :userInfo="userInfo"
@@ -23,9 +23,9 @@
         :continuousday="continuousday"
       ></sign>
     </div>
-    <div class=" tdbtn" @click="toUrl">签到</div>
+    <div class="tdbtn" @click="toUrl">立即跟读</div>
 
-    <div class="btn" @click="UnsuDelete">退订</div>
+    <!--<div class="btn" @click="UnsuDelete">退订</div>-->
 
   </div>
 </template>
@@ -83,7 +83,7 @@ export default {
 
 
     let url =
-      "http://clock.10huisp.com/dist/#" +
+      "http://daka.xiaochendu.com/dist/#" +
       this.$route.path +
       "?id=" +
       this.$route.query.id;
@@ -138,6 +138,9 @@ export default {
       });
       // config信息验证后才执行
       _this.ready(() => {});
+      _this.error(res => {
+        alert("出错了：" + res.errMsg); // 这个地方的好处就是wx.config配置错误，会弹出窗口哪里错误，然后根据微信文档查询即可。
+      });
       _this.onMenuShareTimeline({
         title: "现在我这个是分享到朋友圈1", // 分享标题
         desc: "我这个就是一个简单的分享朋友圈描述", //分享描述
@@ -281,10 +284,23 @@ $fontColor: #f2f2f2;
   margin-left: 80%;
 }
 .tdbtn {
+  /*position: fixed;*/
+  /*bottom: 1.5rem;*/
+  /*position: fixed;*/
+  /*width: 100%;*/
+  /*margin: auto;*/
+  /*text-align: center;*/
+  /*background: #39bafc;*/
+  /*padding: 10px;*/
+  /*color: #fff;*/
+  /*font-size: 0.3rem;*/
+  /*font-weight: 800;*/
+  /*border-radius: 1rem;*/
+  /*margin-left: 80%;*/
   position: fixed;
-  bottom: 1.5rem;
+  bottom: .2rem;
   position: fixed;
-  width: 8%;
+  width: 90%;
   margin: auto;
   text-align: center;
   background: #39bafc;
@@ -293,7 +309,8 @@ $fontColor: #f2f2f2;
   font-size: 0.3rem;
   font-weight: 800;
   border-radius: 1rem;
-  margin-left: 80%;
+  margin: auto;
+  margin-left: 2%;
 }
 </style>
 

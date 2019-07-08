@@ -11,7 +11,8 @@
 </template>
 
 <script>
-import HZRecorder from "@util/HZRecorder";
+  import { quillEditor } from 'vue-quill-editor'
+
 import { Toast, InfiniteScroll } from "mint-ui";
 import { PostDataByAdd } from "@api/sign";
 

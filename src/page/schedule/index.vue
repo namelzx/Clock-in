@@ -4,7 +4,7 @@
       <div class="list-items">
         <div>开启学习提醒</div>
         <div class="switch">
-          <van-switch v-model="temp.checked" @change="getpost" />
+          <van-switch v-model="temp.checked" @change="getpost"/>
         </div>
       </div>
       <div class="list-items" @click="show=true">
@@ -38,7 +38,7 @@
             <div class="list-items">
               <div>{{item.dname}}</div>
               <div class="span">
-                <van-checkbox :name="item.dvalue" ref="checkboxes" @click="toggle(item)" />
+                <van-checkbox :name="item.dvalue" ref="checkboxes" @click="toggle(item)"/>
               </div>
             </div>
           </div>
@@ -49,159 +49,170 @@
 </template>
 
 <script>
-import { postSchedule, getSchedule } from "@api/schedule";
-export default {
-  data() {
-    return {
-      currentDate: "12:00",
-      show: false,
-      weeks: false,
-      checked: true,
-      result: [],
-      resultdata: [],
-      temp: {
-        currentDate: "",
+  import { Toast, InfiniteScroll } from "mint-ui";
+
+  import {getSchedule, postSchedule} from "@api/schedule";
+
+  export default {
+    data() {
+      return {
+        currentDate: "12:00",
+        show: false,
+        weeks: false,
+        checked: true,
         result: [],
-        checked: false,
-        user_id: 2
-      },
-      list: [
-        {
-          dname: "周一",
-          dvalue: "Tue"
+        resultdata: [],
+        temp: {
+          currentDate: "",
+          result: [],
+          checked: false,
+          user_id: 2
         },
-        {
-          dname: "周二",
-          dvalue: "Wed"
-        },
-        {
-          dname: "周三",
-          dvalue: "Thu"
-        },
-        {
-          dname: "周四",
-          dvalue: "Fri"
-        },
-        {
-          dname: "周五",
-          dvalue: "Sat"
-        },
-        {
-          dname: "周六",
-          dvalue: "Sun"
-        },
-        {
-          dname: "周日",
-          dvalue: "Mon"
-        }
-      ]
-    };
-  },
-  created() {
-    this.getScheduleData();
-  },
-  methods: {
-      getpost(){
-          this.postData();
-      },
-    getScheduleData() {
-      getSchedule(this.temp.user_id).then(res => {
-        if (res.data.temp.checked === 1) {
-          res.data.temp.checked = true;
-        } else {
-          res.data.temp.checked = false;
-        }
-        if(res.data.temp!==null){
-        this.temp = res.data.temp;
-
-        }
-
-        this.resultdata = res.data.result;
-        var arr = [];
-        for (let index = 0; index < res.data.result.length; index++) {
-          arr[index] = res.data.result[index].dvalue;
-        }
-        this.result = arr;
-      });
+        list: [
+          {
+            dname: "周一",
+            dvalue: "Tue"
+          },
+          {
+            dname: "周二",
+            dvalue: "Wed"
+          },
+          {
+            dname: "周三",
+            dvalue: "Thu"
+          },
+          {
+            dname: "周四",
+            dvalue: "Fri"
+          },
+          {
+            dname: "周五",
+            dvalue: "Sat"
+          },
+          {
+            dname: "周六",
+            dvalue: "Sun"
+          },
+          {
+            dname: "周日",
+            dvalue: "Mon"
+          }
+        ]
+      };
     },
-    handelremind(e) {
-      this.temp.currentDate = e;
-      this.show = false;
-      this.postData();
+    created() {
+      this.temp.user_id=this.$route.query.user_id
+
+      this.getScheduleData();
     },
-    toggle(index) {
-      if (this.resultdata.indexOf(index) > -1 || this.resultdata.length > 0) {
-        for (let i = 0; i < this.resultdata.length; i++) {
-          if (this.resultdata[i].dvalue == index.dvalue) {
-            this.resultdata.splice(i, 1);
-            this.postData();
-            return;
+    methods: {
+      getpost() {
+        this.postData();
+      },
+      getScheduleData() {
+        getSchedule(this.temp.user_id).then(res => {
+          if (res.data.temp.checked === 1) {
+            res.data.temp.checked = true;
+          } else {
+            res.data.temp.checked = false;
+          }
+          if (res.data.temp !== null) {
+            this.temp = res.data.temp;
+          }
+
+          this.resultdata = res.data.result;
+          var arr = [];
+          for (let index = 0; index < res.data.result.length; index++) {
+            arr[index] = res.data.result[index].dvalue;
+          }
+          this.result = arr;
+        });
+      },
+      handelremind(e) {
+        this.temp.currentDate = e;
+        this.show = false;
+        this.postData();
+      },
+      toggle(index) {
+        if (this.resultdata.indexOf(index) > -1 || this.resultdata.length > 0) {
+          for (let i = 0; i < this.resultdata.length; i++) {
+            if (this.resultdata[i].dvalue == index.dvalue) {
+              this.resultdata.splice(i, 1);
+              this.postData();
+              return;
+            }
           }
         }
+
+        this.resultdata.push(index);
+        this.postData();
+      },
+      postData() {
+        this.temp.result = this.resultdata;
+        postSchedule(this.temp).then(res => {
+          Toast('小贴士:已完成当日计划规则不会提醒');
+        });
       }
-     
-      this.resultdata.push(index);
-      this.postData();
-    },
-    postData() {
-      this.temp.result = this.resultdata;
-      postSchedule(this.temp).then(res => {
-        console.log(res);
-      });
     }
-  }
-};
+  };
 </script>
 <style lang="scss" scoped>
-.list-items >>> .switch {
-  margin-top: 0.1rem;
-}
-.list {
-  display: flex;
-  flex-direction: column;
-  .list-items {
+  .list-items > > > .switch {
+    margin-top: 0.1rem;
+  }
+
+  .list {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    height: 1.5rem;
-    align-items: center;
-    width: 95%;
-    margin: auto;
-    font-size: 0.3rem;
-    color: black;
-    border-bottom: 1px solid #eae6e6;
-    .span {
-      color: #aaa;
-      font-size: 0.5rem;
+    flex-direction: column;
+
+    .list-items {
       display: flex;
       flex-direction: row;
-      .list {
-        font-size: 0.3rem;
-        text-indent: 0.1rem;
+      justify-content: space-between;
+      height: 1.5rem;
+      align-items: center;
+      width: 95%;
+      margin: auto;
+      font-size: 0.3rem;
+      color: black;
+      border-bottom: 1px solid #eae6e6;
+
+      .span {
+        color: #aaa;
+        font-size: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .list {
+          font-size: 0.3rem;
+          text-indent: 0.1rem;
+        }
       }
     }
   }
-}
 
-.che {
-  display: flex;
-  flex-direction: column;
-  .list-items {
+  .che {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    height: 1rem;
-    align-items: center;
-    width: 95%;
-    margin: auto;
-    font-size: 0.3rem;
-    color: black;
-    border-bottom: 1px solid #eae6e6;
-    .span {
-      color: #aaa;
-      font-size: 0.5rem;
+    flex-direction: column;
+
+    .list-items {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      height: 1rem;
+      align-items: center;
+      width: 95%;
+      margin: auto;
+      font-size: 0.3rem;
+      color: black;
+      border-bottom: 1px solid #eae6e6;
+
+      .span {
+        color: #aaa;
+        font-size: 0.5rem;
+      }
     }
   }
-}
 </style>
 

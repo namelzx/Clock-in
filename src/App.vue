@@ -25,6 +25,13 @@
         this.$route.query.user_id === undefined &&
         this.$store.state.user_id === 0
       ) {
+
+        if(this.$route.fullPath==='/schedule'){
+            window.location.href =
+            this.$store.state.url+"/?url=" + this.$route.fullPath;
+          return false;
+        }
+
         if (this.$route.query.id !== undefined) {
           window.location.href =
             this.$store.state.url+"/?url=" + this.$route.fullPath;

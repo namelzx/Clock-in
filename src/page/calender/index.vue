@@ -22,7 +22,7 @@
           <div class="title">{{userInfo.nickname}}</div>
           <div class="info">已签到{{sum}}天，连续签到{{continuousday}}天</div>
         </div>
-        <div class="remind" @click="show=true">每日打卡提醒</div>
+        <div class="remind"  @click="UnsuDelete">退订</div>
       </div>
     </div>
     <calender @test1="test" :userInfo="userInfo" :markArr="markArr"></calender>
@@ -34,8 +34,9 @@
 
 <script>
 import calender from "@cmpt/calender/calender";
-import { GetIdBydetailed } from "@api/colck";
+import { GetIdBydetailed,GetIdByUnsuDelete } from "@api/colck";
 import { Popup, DatetimePicker, Toast } from "vant";
+
 export default {
   name: "App",
 
@@ -49,18 +50,23 @@ export default {
       markArr: [],
       userInfo: {},
       sum: 0,
-      continuousday: 0
+      continuousday: 0,
+      id:0,
+      detailed:0,
+
     };
   },
   created() {
     this.userInfo = this.$store.state.userInfo;
     var temp = {};
+    this.id=this.$route.query.id;
     temp.id = this.$route.query.id;
     temp.user_id = this.$store.state.user_id;
     GetIdBydetailed(temp).then(res => {
       this.markArr = res.data.data.get_sign;
       this.sum = res.data.sum;
       this.continuousday = res.data.continuousday;
+      this.detailed=res.data.data
     });
   },
   methods: {
@@ -68,7 +74,21 @@ export default {
       console.log(e);
       Toast('设置成功，明天开始将会准时给你提醒');
       this.show=false
-    }, 
+    },
+
+    UnsuDelete() {
+      var temp = {
+        zhuti_id: this.id,
+        user_id: this.$store.state.user_id
+      };
+      if (this.$store.state.userInfo.id === this.detailed.user_id) {
+        Toast("不能退订自己建立的主题");
+        return;
+      }
+      GetIdByUnsuDelete(temp).then(res => {
+        this.$router.push({ path: "/" });
+      });
+    },
     test(item) {}
   }
 };

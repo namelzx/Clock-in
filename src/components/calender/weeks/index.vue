@@ -25,8 +25,14 @@
           :key="index"
           @click="handelDay(item.zhuti_id,item.days)"
         >
+
           <div v-if="item.day==day" :class="item.chetrue?'d':''">今</div>
-          <div v-else :class="item.chetrue?'d':''">{{item.day}}</div>
+          <div v-else :class="item.chetrue?'d':''">
+            <span v-if="item.day<day" :class="item.chetrue?'d':'vv'">{{item.day}}</span>
+            <span v-else :class="item.chetrue?'d':''">{{item.day}}</span>
+            <!--{{item.day}}-->
+            <!--{{item.chetrue}}-->
+          </div>
         </div>
       </div>
     </div>
@@ -37,7 +43,12 @@
 import { Toast, InfiniteScroll } from "mint-ui";
 export default {
   props: {
-    id: String,
+    id: {
+      type: Number,
+      default() {
+        return 0;
+      }
+    },
     markArr: {
       type: Array,
       default() {
@@ -321,6 +332,17 @@ $fontColor: #fff;
           height: 20px;
           border-radius: 50px;
           line-height: 20px;
+        }
+        .vv{
+          background: #c6c7c9;
+          color: #fff;
+          width: 20px;
+          height: 20px;
+          border-radius: 50px;
+          line-height: 20px;
+          padding: 2px;
+          padding-left: 7px;
+          padding-right: 7px;
         }
       }
     }
