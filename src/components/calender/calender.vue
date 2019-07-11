@@ -37,10 +37,18 @@
         >
           <div class="calender-item" :class="item.chetrue?'d':''" @click="handelDay(item.zhuti_id,item.days)">
 
-            <div v-if="item.day==day">今</div>
-            <div v-else>
-              <span v-if="item.day<day" :class="item.chetrue?'d':'vv'">{{item.day}}</span>
+
+
+            <div v-if="item.day<day||  item.month<thismonth" :class="item.chetrue?'d':'c'">
+              <span v-if="item.day<day" :class="item.chetrue?'d':''">{{item.day}}</span>
               <span v-else :class="item.chetrue?'d':''">{{item.day}}</span>
+              <!--{{item.day}}-->
+              <!--{{item.chetrue}}-->
+            </div>
+            <div v-else :class="item.chetrue?'d':''">
+              <span  :class="item.chetrue?'d':''" v-if="item.day==day">今</span>
+              <span  :class="item.chetrue?'d':''" v-else>{{item.day}}</span>
+
             </div>
           </div>
         </div>
@@ -71,6 +79,7 @@
     data() {
       return {
         day: "",
+        thismonth:3,
         month: "",
         year: "",
         currentDays: "",
@@ -82,6 +91,8 @@
       this._getCurrentDate();
     },
     created() {
+      let date = new Date();
+      this.thismonth = date.getMonth() + 1;
     },
     methods: {
       handelDay(id, days) {
@@ -335,20 +346,31 @@
   .d {
     background: #4dc862;
     color: #fff;
+    border-radius: 100%;
+    height: 25px;
+    width: 25px;
+    line-height: 25px;
   }
-
-  .vv {
-    background: #c6c7c9;
+  .vv{
+    /*background: #c6c7c9;*/
+    /*color: #fff;*/
+    /*width: 20px;*/
+    /*height: 20px;*/
+    /*border-radius: 50px;*/
+    /*line-height: 20px;*/
+    /*padding: 2px;*/
+    /*padding-left: 7px;*/
+    /*padding-right: 7px;*/
+  }
+  .c{
+    width: 30px;
+    height: 30px;
+    background: #999;
+    border-radius: 100%;
+    line-height: 30px;
+    background: #c2c9cc;
     color: #fff;
-    width: 20px;
-    height: 20px;
-    border-radius: 50px;
-    line-height: 20px;
-    padding: 2px;
-    padding-left: 7px;
-    padding-right: 7px;
   }
-
   .no-current-day {
     visibility: hidden;
   }

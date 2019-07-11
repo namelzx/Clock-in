@@ -17,6 +17,28 @@ export function PostDataByAdd(data) {
     })
 };
 
+//要文轮播图
+export function getTheme(id) {
+  return request({
+    url: 'gettheme',
+    method: 'get',
+    params:{id}
+  })
+};
+
+//要文轮播图
+export function GetIdByThemeByDel(id) {
+  return request({
+    url: 'GetIdByThemeByDel',
+    method: 'get',
+    params:{id}
+  })
+};
+
+
+
+
+
 export function GetDataByList(query) {
     return request({
         url: 'GetDataByList',

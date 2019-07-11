@@ -26,13 +26,19 @@
           @click="handelDay(item.zhuti_id,item.days)"
         >
 
-          <div v-if="item.day==day" :class="item.chetrue?'d':''">今</div>
-          <div v-else :class="item.chetrue?'d':''">
-            <span v-if="item.day<day" :class="item.chetrue?'d':'vv'">{{item.day}}</span>
+          <!--<div v-if="item.day==day" :class="item.chetrue?'d':''">今</div>-->
+          <div v-if="item.day<day" :class="item.chetrue?'d':'c'">
+            <span v-if="item.day<day" :class="item.chetrue?'d':''">{{item.day}}</span>
             <span v-else :class="item.chetrue?'d':''">{{item.day}}</span>
             <!--{{item.day}}-->
             <!--{{item.chetrue}}-->
           </div>
+          <div v-else :class="item.chetrue?'d':''">
+            <span  :class="item.chetrue?'d':''" v-if="item.day==day">今</span>
+            <span  :class="item.chetrue?'d':''" v-else>{{item.day}}</span>
+
+          </div>
+
         </div>
       </div>
     </div>
@@ -275,6 +281,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 $fontColor: #fff;
+$weekBg:#c2c9cb;
 .desc >>> .iconfont {
   font-size: 13px;
 }
@@ -309,6 +316,7 @@ $fontColor: #fff;
       height: 0.5rem;
       align-items: center;
       width: 100%;
+      padding-top: 10px;
       .calender-days {
         width: 14%;
         text-align: center;
@@ -328,21 +336,30 @@ $fontColor: #fff;
         .d {
           background: #4dc862;
           color: #fff;
-          width: 20px;
-          height: 20px;
+          width: 30px;
+          height: 30px;
           border-radius: 50px;
-          line-height: 20px;
+          line-height: 30px;
         }
         .vv{
-          background: #c6c7c9;
+          /*background: #c6c7c9;*/
+          /*color: #fff;*/
+          /*width: 20px;*/
+          /*height: 20px;*/
+          /*border-radius: 50px;*/
+          /*line-height: 20px;*/
+          /*padding: 2px;*/
+          /*padding-left: 7px;*/
+          /*padding-right: 7px;*/
+        }
+        .c{
+          width: 30px;
+          height: 30px;
+          background: #999;
+          border-radius: 100%;
+          line-height: 30px;
+          background: #c2c9cc;
           color: #fff;
-          width: 20px;
-          height: 20px;
-          border-radius: 50px;
-          line-height: 20px;
-          padding: 2px;
-          padding-left: 7px;
-          padding-right: 7px;
         }
       }
     }
@@ -354,7 +371,7 @@ $fontColor: #fff;
         width: 14%;
         float: left;
         text-align: center;
-        background: #c2c9cb;
+        background: $weekBg;
         border-radius: 100%;
         padding: 0.1rem;
       }

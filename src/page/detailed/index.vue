@@ -14,7 +14,7 @@
         </div>
       </header>
       <weeks :markArr="markAll" :id="id" @sendiptVal="showChildMsg"></weeks>
-      <card :desc="detailed.zhuti_desc" :voice="detailed.get_voice"></card>
+      <card :theme="get_theme" :desc="detailed.zhuti_desc" :voice="detailed.get_voice"></card>
       <sign
         :title="sign"
         :userInfo="userInfo"
@@ -52,6 +52,8 @@ export default {
   },
   data() {
     return {
+      edit:false,
+      get_theme:{},
       show: false,
       id: 0,
       desc: "111",
@@ -61,6 +63,7 @@ export default {
         id: undefined,
         days: undefined
       },
+      config:{},
       continuousday: 0,
       sum: 0,
       userInfo: {},
@@ -79,8 +82,8 @@ export default {
     };
   },
   created() {
-    console.log( this.$store.state.user_id)
 
+   this.config= this.$store.state.config
 
     let url =
       "http://daka.xiaochendu.com/dist/#" +
@@ -142,16 +145,16 @@ export default {
         alert("出错了：" + res.errMsg); // 这个地方的好处就是wx.config配置错误，会弹出窗口哪里错误，然后根据微信文档查询即可。
       });
       _this.onMenuShareTimeline({
-        title: "现在我这个是分享到朋友圈1", // 分享标题
-        desc: "我这个就是一个简单的分享朋友圈描述", //分享描述
+        title: this.detailed.title, // 分享标题
+        desc:  this.detailed.title+this.config.theme, //分享描述
         link: url, // 分享链接
-        imgUrl: "https://pwmapi.oss-cn-beijing.aliyuncs.com/bj.jpeg" // 图片
+        imgUrl: this.detailed.ico // 图片
       });
       wx.onMenuShareAppMessage({
-        title: "我觉得我这个是分享到好友", // 分享标题
-        desc: "我这个就是一个简单的分享好友描述", //分享描述
+        title: this.detailed.title, // 分享标题
+        desc:  this.detailed.title+this.config.theme, //分享描述
         link: url,
-        imgUrl: "https://pwmapi.oss-cn-beijing.aliyuncs.com/bj.jpeg", // 图片
+        imgUrl:this.detailed.ico, // 图片
         success() {
           opstion.success();
         },
@@ -195,6 +198,7 @@ export default {
         this.sumsign=res.data.sumsign;
         this.sumZhuti=res.data.sumZhuti;
         this.desc = this.detailed.desc;
+        this.get_theme=this.detailed.get_theme
         this.continuousday = res.data.continuousday;
 
         Toast.clear();
@@ -251,17 +255,18 @@ $fontColor: #f2f2f2;
       }
       .desc {
         font-weight: 500;
-        font-size: 0.35rem;
+        font-size: 0.4rem;
         padding-left: 0.3rem;
         .info {
           font-weight: 400;
-          font-size: 10px;
+          font-size: 0.3rem;
         }
         .info-desc {
           padding-top: 0.5rem;
           font-size: 0.25rem;
           font-weight: 400;
           color: #e0e0e0;
+          width: 90%;
         }
       }
     }

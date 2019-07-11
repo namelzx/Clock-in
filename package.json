@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@xkeshi/vue-qrcode": "xkeshi/vue-qrcode",
+    "animate.css": "^3.7.2",
     "axios": "^0.18.0",
+    "benz-amr-recorder": "^1.0.14",
     "canvas2image": "^1.0.5",
     "html2canvas": "^1.0.0-rc.3",
     "mint-ui": "^2.2.13",
@@ -65,6 +67,7 @@
     "stylus-loader": "^3.0.2",
     "uglifyjs-webpack-plugin": "^1.1.1",
     "url-loader": "^0.5.8",
+    "vue-html5-editor": "^1.1.1",
     "vue-loader": "^13.3.0",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.5.2",

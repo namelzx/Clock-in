@@ -27,17 +27,28 @@
         </div>
         <div class="items-desc">
           <div class="yy">
-            <audio ref="player" v-if="item.voice_url" :src="item.voice_url" controls></audio>
-            <span class="tt">{{item.time_len}}</span>
+            <!--<audio v-if="item.voice_url" :src="item.voice_url"></audio>-->
+            <m-audio  v-if="item.voice_url" :src="item.voice_url"></m-audio>
+
+            <!---->
+            <!--<audio ref="player" v-if="item.voice_url" :src="item.voice_url" controls></audio>-->
+            <!--<span class="tt" v-if="item.voice_url" >{{item.time_len}}</span>-->
           </div>
-          <div> {{item.desc}}</div>
+          <div class="sign-desc"> {{item.desc}}</div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
+
+
 <script>
+  import Vue from 'vue'
+
+  import audio from 'vue-mobile-audio'
+  Vue.use(audio);
+
   export default {
     props: {
       headimgurl: String,
@@ -56,6 +67,9 @@
           return [];
         }
       }
+    },
+    comments:{
+      audio
     },
 
     data() {
@@ -96,7 +110,8 @@
     display: flex;
     flex-direction: column;
     margin-top: 0.2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 3rem;
 
     .sign-top {
       display: flex;
@@ -137,7 +152,7 @@
 
         .info {
           font-weight: 400;
-          font-size: 10px;
+          font-size: 12px;
           color: #868585;
         }
 
@@ -210,7 +225,6 @@
       .ico {
         display: flex;
         flex-direction: column;
-
         img {
           width: 14px;
         }
@@ -244,12 +258,19 @@
           padding-top: 16px;
           padding-bottom: 30px;
           font-size: .25rem;
-          text-indent: 20px;
+          /*text-indent: 20px;*/
           .yy{
             /*background: red;*/
             display: flex;
             align-items: center;
-            width: 60px;
+            width: 100px;
+            audio{
+              width: 50px;
+
+            }
+            .sign-desc{
+              font-size: 15px;
+            }
 
             .tt{
               text-align: center;
@@ -263,4 +284,61 @@
   }
 
 </style>
+
+<style type="text/css">
+  .box {
+    width: 30px;
+    height: 30px;
+    box-sizing: border-box;
+    position: relative;
+  }
+  .wifi-symbol {
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    overflow: hidden;
+    transform: rotate(135deg);
+
+  }
+  .wifi-circle {
+    border: 5px solid #999999;
+    border-radius: 50%;
+    position: absolute;
+  }
+
+  .first {
+    width: 5px;
+    height: 5px;
+    background: #cccccc;
+    top: 45px;
+    left: 45px;
+  }
+
+  .second {
+    width: 25px;
+    height: 25px;
+    top: 35px;
+    left: 35px;
+    /*animation: fadeInOut 1s infinite 0.2s;.*/
+
+  }
+
+  .third {
+    width: 40px;
+    height: 40px;
+    top: 25px;
+    left: 25px;
+    animation: fadeInOut 1s infinite 0.4s;
+  }
+
+  @keyframes fadeInOut {
+    0% {
+      opacity: 0; /*初始状态 透明度为0*/
+    }
+    100% {
+      opacity: 1; /*结尾状态 透明度为1*/
+    }
+  }
+</style>
+
 

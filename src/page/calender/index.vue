@@ -86,7 +86,13 @@ export default {
         return;
       }
       GetIdByUnsuDelete(temp).then(res => {
-        this.$router.push({ path: "/" });
+        this.$router.push({
+          path: "/detailed",
+          query: {
+            id:this.id
+          }
+        });
+        // this.$router.push({ path: "/" });
       });
     },
     test(item) {}
@@ -148,8 +154,8 @@ $fontColor: #fff;
     }
     .remind {
       font-weight: 400;
-      font-size: 0.2rem;
-      padding-left: 0.5rem;
+      font-size: 0.3rem;
+      padding-left: 2rem;
 
       color: black;
       display: flex;

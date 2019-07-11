@@ -10,6 +10,9 @@ import { Toast, InfiniteScroll } from 'mint-ui'
 import Vant from 'vant';
 import 'vant/lib/index.css';
 
+import { Collapse, CollapseItem } from 'vant';
+
+Vue.use(Collapse).use(CollapseItem);
 
 
 Vue.use(Vant);
@@ -20,6 +23,7 @@ import 'mint-ui/lib/style.css'
 import '@style/common/reset.less'// 重置浏览器样式以及mint样式替换
 import '@style/iconfont/iconfont.css'// 字体图标样式文件
 Vue.config.productionTip = false
+
 
 Vue.prototype.$toast = Toast;
 Vue.use(InfiniteScroll)

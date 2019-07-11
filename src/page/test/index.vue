@@ -3,26 +3,25 @@
     <div class="head-sign" v-if="sign">
       <div class="head-title">今日领读精要</div>
       <div class="head-main">
-        <div class="list-items" v-show="detail.data.get_voice">
+
+        <div class="list-items" >
           <div class="ico">
             <img :src="detail.data.ico">
           </div>
           <div class="yy">
-            <audio :src="voiceurl" controls></audio>
-            <span>{{detail.data.get_voice.time_len}}</span>
+            <m-audio  v-if="detail.data.get_theme.url" :src="detail.data.get_theme.url"></m-audio>
+            <!--<audio :src="voiceurl" controls></audio>-->
+            <!--<span>{{detail.data.get_voice.time_len}}</span>-->
           </div>
         </div>
-        <div class="list-items" v-show="detail.data.zhuti_desc">
+        <div class="list-items" v-show="detail.data.get_theme.zhuti_desc">
           <div class="ico">
             <img :src="detail.data.ico">
-
           </div>
-
           <div class="bodyFont clearfloat" id="bodyFont" ref="bodyFont" :class="{bodyHeight:contentStatus}">
-            <div class="yy msdesc" v-html="detail.data.zhuti_desc">
+            <div class="yy msdesc" v-html="detail.data.get_theme.zhuti_desc">
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -44,11 +43,8 @@
             <audio ref="player" id="audio" src controls></audio>
           </div>
         </div>
-
         <div class="btndd" @click="again" v-if='starttitle=="开始播放"'>重新录音</div>
         <div class="btndd" @click="again" v-if='starttitle=="结束播放"'>重新录音</div>
-
-
       </div>
       <div class="add-items">
         <div class="dtitle">签到活动说明</div>
@@ -75,16 +71,18 @@
 </template>
 
 <script>
+  import Vue from 'vue'
+
+  import audio from 'vue-mobile-audio'
+  Vue.use(audio);
   import {InfiniteScroll, Toast} from "mint-ui";
   import {PostDataByAdd} from "@api/sign";
-
   import wx from "weixin-js-sdk";
   import {getJssdk} from "@api/user";
   import {postmateial} from "@api/material";
-
   import {GetIdBydetailed} from "@api/colck";
   import {quillEditor} from 'vue-quill-editor'
-
+  //
   const _this = wx;
   export default {
     name: "HelloWorld",
@@ -99,7 +97,6 @@
             toolbar: 'title'
           },
         },
-
         voiceurl: '',
         desc: "驽马十驾，功在不舍。\n" +
           "坚持是一种信仰! .",
@@ -121,6 +118,7 @@
         id: 0,
         detail: {},
         dedd: "",
+        config:{},
         tempdata: {
           sum: 0,
         }
@@ -133,6 +131,12 @@
       },500)
     },
     created() {
+      // amr.initWithUrl('http://daka.xiaochendu.com/uploads/voice/1562480145.amr').then(function() {
+      //   amr.play();
+      // });
+
+      this.config= this.$store.state.config
+
       let url =
         "http://daka.xiaochendu.com/dist/#" +
         this.$route.path +
@@ -169,16 +173,16 @@
           alert("出错了：" + res.errMsg); // 这个地方的好处就是wx.config配置错误，会弹出窗口哪里错误，然后根据微信文档查询即可。
         });
         _this.onMenuShareTimeline({
-          title: "现在我这个是分享到朋友圈1", // 分享标题
-          desc: "我这个就是一个简单的分享朋友圈描述", //分享描述
+          title: this.detailed.title, // 分享标题
+          desc:  this.detailed.title+this.config.theme, //分享描述
           link: url, // 分享链接
-          imgUrl: "https://pwmapi.oss-cn-beijing.aliyuncs.com/bj.jpeg" // 图片
+          imgUrl: this.detailed.ico // 图片
         });
         wx.onMenuShareAppMessage({
-          title: "我觉得我这个是分享到好友", // 分享标题
-          desc: "我这个就是一个简单的分享好友描述", //分享描述
+          title: this.detailed.title, // 分享标题
+          desc:  this.detailed.title+this.config.theme, //分享描述
           link: url,
-          imgUrl: "https://pwmapi.oss-cn-beijing.aliyuncs.com/bj.jpeg", // 图片
+          imgUrl:this.detailed.ico, // 图片
           success() {
             opstion.success();
           },
@@ -200,7 +204,7 @@
 
         var temp = res.data.data
 
-        if (temp.get_voice !== undefined && temp.theme !== undefined) {
+        if (temp.get_theme !== undefined ) {
           this.sign = true
           this.voiceurl = temp.get_voice.url
         }
@@ -210,7 +214,6 @@
     methods: {
       contentToggle(){
         this.curHeight=this.$refs.bodyFont.offsetHeight;
-        console.log(this.curHeight)
         if(this.curHeight>this.bodyHeight){
 
           this.contentStatus=true;
@@ -241,6 +244,7 @@
         var that = this;
         this.temp.user_id = this.$store.state.user_id;
         this.temp.zhuti_id = this.id;
+
         let date = new Date();
         this.temp.days =
           date.getFullYear() +
@@ -248,17 +252,17 @@
           parseInt(date.getMonth() + 1) +
           "-" +
           date.getDate();
-        if (this.temp.desc.length < 3) {
+        if (that.temp.desc.length < 3) {
           Toast('随便说点什么吧');
           return false;
         }
-        PostDataByAdd(this.temp).then(res => {
+        PostDataByAdd(that.temp).then(res => {
           var tmep = {
-            id: this.id,
-            user_id: this.$store.state.user_id
+            id: that.id,
+            user_id: that.$store.state.user_id
           }
           GetIdBydetailed(tmep).then(res => {
-            this.tempdata = res.data
+            that.tempdata = res.data
           })
           this.show = true;
         });
@@ -458,7 +462,6 @@
           }
         })
           .then(res => {
-            console.log(res);
             this.$refs.player.src = res.data;
           })
           .catch(error => {
@@ -516,14 +519,18 @@
           margin-right: .3rem;
 
         }
-
         .msdesc {
           border: 1px solid #aaa;
           border-radius: 3px;
           padding: 10px;
-          width: 100%;
+          width: 60%;
           height: 100%;
           overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          min-width: 4.5rem;
+          align-items: baseline;
+          max-width: 4.5rem;
         }
 
         img {
@@ -684,7 +691,7 @@
   .hide-article-box{
     position: absolute;
     top: 206px;
-    width: 70%;
+    width: 60%;
     text-align: center;
     background: #fff;
     margin-left: 25%;
@@ -692,7 +699,10 @@
   .yy{
     display: flex;
     align-items: center;
-    width: 60px;
+    width: 100px;
+    audio{
+      width: 50px;
+    }
   }
 </style>
 

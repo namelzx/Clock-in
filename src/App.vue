@@ -8,6 +8,8 @@
   import {getDataByUser, getJssdk} from "@api/user";
   import wx from "weixin-js-sdk";
 
+  import { GetConfig} from "@api/config";
+
   const _this = wx;
   export default {
     name: "App",
@@ -17,6 +19,9 @@
       };
     },
     created(){
+      GetConfig().then(res=>{
+        this.$store.state.config=res.data.data
+      })
 
       this.fullPath = location.href;
       this.admin = this.$store.state.userInfo.admin;

@@ -9,17 +9,18 @@
         class="list-items"
         v-for="(item,index) in MyList"
         :key="index"
-        @click="handelUrl(item.id)"
+
       >
 
         <div class="list-tx">
-          <img :src="item.ico" />
+          <img :src="item.ico"  @click="handelUrl(item.id)"/>
         </div>
-        <div class="lsit-desc">
+        <div class="lsit-desc" @click="handelUrl(item.id)">
           <div class="title">{{item.title}}</div>
           <div class="desc">{{item.get_sign_count.length}}人参与|{{item.get_sign.length}}打卡</div>
         </div>
         <div class="arr">
+          <span  @click="totheme(item.id)">编辑</span>
           <i class="iconfont">&#xe617;</i>
         </div>
       </div>
@@ -32,6 +33,7 @@ export default {
   props: {
     iconfont: String,
     mytitle: String,
+    admin:false,
     MyList: {
       type: Array,
       default() {
@@ -40,7 +42,14 @@ export default {
     }
   },
   created() {
-    console.log(this.mytitle);
+    if(this.$store.state.userInfo.admin==1){
+      this.admin=true
+    }else{
+      this.admin=false
+    }
+    // console.log(this.$store.state.userInfo)
+    //
+    // console.log(this.mytitle);
   },
   data() {
     return {
@@ -51,6 +60,14 @@ export default {
     };
   },
   methods: {
+    totheme(id){
+      this.$router.push({
+        path: "/add",
+        query: {
+          id
+        }
+      });
+    },
     handelUrl(id) {
       this.$router.push({
         path: "/detailed",
@@ -114,6 +131,11 @@ $backgroundconent: #f6f6f6;
 
       }
     }
+    .arr{
+      display: flex;
+      flex-direction: row;
+      width: 20%;
+    }
     .lsit-desc {
       color: black;
       font-size: 0.34rem;
@@ -127,5 +149,6 @@ $backgroundconent: #f6f6f6;
     }
   }
 }
+
 </style>
 

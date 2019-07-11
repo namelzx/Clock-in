@@ -31,7 +31,9 @@ export default {
       mytitle: "我的打卡",
       youtitle: "打卡活动",
       admin: 2,
-      MyList: []
+      MyList: [],
+      config:{},
+      ico:"",
     };
   },
   computed:{
@@ -50,7 +52,10 @@ export default {
   },
 
   created() {
+
+
     this.fullPath = location.href;
+    console.log( this.fullPath)
     this.admin = this.$store.state.userInfo.admin;
     this.listQuery.user_id = this.$route.query.user_id;
     this.getDataList();
@@ -83,7 +88,7 @@ export default {
 
     getJssdk(this.fullPath).then(res => {
       let list = res.data;
-
+      this.config= this.$store.state.config
       _this.config({
         // debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
         appId: list.appId, // 必填，公众号的唯一标识
@@ -108,18 +113,19 @@ export default {
       // config信息验证后才执行
       _this.ready(() => {
       });
-
+      //朋友圈
       _this.onMenuShareTimeline({
-        title: "我猜这个还行吧", // 分享标题
-        desc: "分享描述", //分享描述
-        link: location.href, // 分享链接
-        imgUrl: "https://pwmapi.oss-cn-beijing.aliyuncs.com/bj.jpeg" // 图片
+        title:  this.config.title, // 分享标题
+        link: 'http://daka.xiaochendu.com/dist/#/', // 分享链接
+        imgUrl: this.config.ico // 图片
       });
+      //好友
       wx.onMenuShareAppMessage({
-        title: "我猜这个还行吧", // 分享标题
-        desc: "你说呢", //分享描述
-        imgUrl: "https://pwmapi.oss-cn-beijing.aliyuncs.com/bj.jpeg", // 图片
-        desc: "应该还行吧", // 分享描述
+        title: this.config.title,// 分享标题imgUrl:this.config.ico, // 图片
+        desc: this.config.generaltheme, // 分享描述
+        link: 'http://daka.xiaochendu.com/dist/#/', // 分享链接
+        imgUrl:this.config.ico, // 图片
+        // imgUrl: this.config.ico
         success() {
           opstion.success();
         },
@@ -131,6 +137,7 @@ export default {
 
     this.admin= this.$store.state.userInfo.admin
   },
+
   methods: {
     toAdd() {
       this.$router.push({ name: "Add" });
