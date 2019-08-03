@@ -156,10 +156,10 @@ export default {
         link: url,
         imgUrl:this.detailed.ico, // 图片
         success() {
-          opstion.success();
+          // opstion.success();
         },
         cancel() {
-          opstion.error();
+          // opstion.error();
         }
       });
 

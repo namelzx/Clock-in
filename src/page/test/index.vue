@@ -1,9 +1,19 @@
 <template>
   <div class="main">
+    <div class="show">
+
+      <van-popup v-model="qdshow">
+        <div class="ico">
+          <i class="iconfont">&#xe60b;</i>
+          <div>签到成功</div>
+        </div>
+        <div class="desc">恭喜你今日签到成功,累积签到{{tempdata.sum}}天，分享到朋友圈即可完成打卡</div>
+        <div class="qdbtn" @click="toPosters">查看成就卡</div>
+      </van-popup>
+    </div>
     <div class="head-sign" v-if="sign">
       <div class="head-title">今日领读精要</div>
       <div class="head-main">
-
         <div class="list-items" >
           <div class="ico">
             <img :src="detail.data.ico">
@@ -14,7 +24,7 @@
             <!--<span>{{detail.data.get_voice.time_len}}</span>-->
           </div>
         </div>
-        <div class="list-items" v-show="detail.data.get_theme.zhuti_desc">
+        <div class="list-items" v-if="detail.data.get_theme!==null">
           <div class="ico">
             <img :src="detail.data.ico">
           </div>
@@ -57,16 +67,7 @@
 
     <div  class="hide-article-box" v-if="contentStatus" @click="contentStatus=!contentStatus">阅读全文</div>
 
-    <div class="show">
-      <van-popup v-model="show">
-        <div class="ico">
-          <i class="iconfont">&#xe60b;</i>
-          <div>签到成功</div>
-        </div>
-        <div class="desc">恭喜你今日签到成功,累积签到{{tempdata.sum}}天，分享到朋友圈即可完成打卡</div>
-        <div class="qdbtn" @click="toPosters">查看成就卡</div>
-      </van-popup>
-    </div>
+
   </div>
 </template>
 
@@ -82,7 +83,11 @@
   import {postmateial} from "@api/material";
   import {GetIdBydetailed} from "@api/colck";
   import {quillEditor} from 'vue-quill-editor'
-  //
+  import { Popup } from 'vant';
+
+  Vue.use(Popup);
+
+
   const _this = wx;
   export default {
     name: "HelloWorld",
@@ -101,6 +106,7 @@
         desc: "驽马十驾，功在不舍。\n" +
           "坚持是一种信仰! .",
         show: false,
+        qdshow:false,
         localId: "",
         serverId: "",
         downLoadId: "",
@@ -137,7 +143,7 @@
 
       this.config= this.$store.state.config
 
-      let url =
+      var url =
         "http://daka.xiaochendu.com/dist/#" +
         this.$route.path +
         "?id=" +
@@ -204,10 +210,11 @@
 
         var temp = res.data.data
 
-        if (temp.get_theme !== undefined ) {
+        if (temp.get_theme !== null ) {
           this.sign = true
           this.voiceurl = temp.get_voice.url
         }
+
       })
 
     },
@@ -241,7 +248,10 @@
         });
       },
       handelPost() {
+        console.log('提交方法')
         var that = this;
+        that.show = true;
+        that.qdshow=true
         this.temp.user_id = this.$store.state.user_id;
         this.temp.zhuti_id = this.id;
 
@@ -264,8 +274,9 @@
           GetIdBydetailed(tmep).then(res => {
             that.tempdata = res.data
           })
-          this.show = true;
         });
+
+
       },
 
       pauseAudio() {

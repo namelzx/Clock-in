@@ -1,24 +1,50 @@
 <template>
-  <div>
+  <div class="main">
+    <div class="show">
+
+      <van-popup v-model="qdshow">
+        <div class="ico">
+          <i class="iconfont">&#xe60b;</i>
+          <div>打卡成功</div>
+        </div>
+        <div class="desc">恭喜你打卡成功,你可以通过日历查看每天签到状态</div>
+        <div class="qdbtn" @click="qdshow=false" >确定</div>
+      </van-popup>
+    </div>
     <div id="imgBox">
 
       <p>长按图片保存到系统相册中然后分享</p>
       <img :src="imgSrc" v-if="imgSrc"/>
 
     </div>
+    <van-popup v-model="pushow" @click="pushow=false">
+
+      <img src="https://kedand.oss-cn-beijing.aliyuncs.com/punch.png">
+    </van-popup>
+
+    <div class="btn" @click="pushow=true" >立即打卡</div>
   </div>
 </template>
 
 <script>
+  import Vue from 'vue'
+
   // import html2canvas from "html2canvas";
 
   // import QRcode from "@xkeshi/vue-qrcode";
 
-  import {GetIdBydetailed} from "@api/colck";
+  import {GetIdBydetailed,postPunch} from "@api/colck";
 
+  import wx from "weixin-js-sdk";
+  import { getJssdk } from "@api/user";
+  const _this = wx;
+  import { Popup } from 'vant';
+
+  Vue.use(Popup);
   export default {
     data() {
       return {
+        qdshow:false,
         temp: {
           continuousday: 0,
           sum: 0,
@@ -26,6 +52,7 @@
             title: ""
           }
         },
+        pushow:false,
         userName: "千里草", //用户称呢
         imgSrc: "", //合成最终图片
         fm: "",//封面图
@@ -38,6 +65,109 @@
     },
 
     created() {
+       var that=this;
+
+      let url =
+        "http://daka.xiaochendu.com/dist/#/detailed/" +
+        "?id=" +
+        this.$route.query.id;
+      this.fullPath = location.href;
+
+      if (
+        this.$route.query.user_id === undefined &&
+        this.$store.state.user_id === 0
+      ) {
+        this.fullPath =
+          this.$store.state.url+"/dist/#" +
+          this.$route.path +
+          "?id=" +
+          this.$route.query.id;
+      }
+      if (
+        this.$route.query.id !== undefined &&
+        this.$route.query.user_id === undefined &&
+        this.$store.state.user_id === 0
+      ) {
+        this.fullPath =
+          this.$store.state.url+"/dist/#" +
+          this.$route.path +
+          "?id=" +
+          this.$route.query.id;
+      }
+
+
+      getJssdk(this.fullPath).then(res => {
+        // console.log(res)
+      var detailed= this.$store.state.config;
+        let list = res.data;
+        _this.config({
+          appId: list.appId, // 必填，公众号的唯一标识
+          timestamp: list.timestamp, // 必填，生成签名的时间戳
+          nonceStr: list.nonceStr, // 必填，生成签名的随机串
+          signature: list.signature, // 必填，签名
+          jsApiList: [
+            "startRecord",
+            "translateVoice",
+            "stopRecord",
+            "playVoice",
+            "pauseVoice",
+            "stopVoice",
+            "uploadVoice",
+            "downloadVoice",
+            "downloadVoice",
+            "onMenuShareTimeline",
+            "onMenuShareAppMessage"
+          ] // 必填，需要使用的JS接口列表
+          // 接口 开始录音接口 停止录音接口 播放语音接口 暂停播放接口 停止播放接口 上传语音接口 下载语音接口 识别音频并返回识别结果接口
+        });
+        // config信息验证后才执行
+        _this.ready(() => {
+          console.log('回调')
+        });
+        _this.error(res => {
+          alert("出错了：" + res.errMsg); // 这个地方的好处就是wx.config配置错误，会弹出窗口哪里错误，然后根据微信文档查询即可。
+        });
+        _this.onMenuShareTimeline({
+          title: detailed.title, // 分享标题
+          desc:  detailed.title+detailed.theme, //分享描述
+          link: url, // 分享链接
+          imgUrl:detailed.ico, // 图片
+          success() {
+
+            that.pushow=false
+            that.qdshow=true
+            that.Punch()
+            console.log('好友回调')
+            // opstion.success();
+          },
+          cancel() {
+
+            this.pushow=false
+            console.log('取消好友回调')
+
+          }
+        });
+        wx.onMenuShareAppMessage({
+          title: detailed.title, // 分享标题
+          desc:  detailed.title+detailed.theme, //分享描述
+          link: url,
+          imgUrl:detailed.ico, // 图片
+          success() {
+            that.pushow=false
+            that.qdshow=true
+            that.Punch()
+            // opstion.success();
+          },
+          cancel() {
+            this.pushow=false
+            console.log('取消好友回调')
+
+            // opstion.error();
+          }
+        });
+
+      });
+
 
       var temp = {
         id: this.$route.query.id,
@@ -48,10 +178,13 @@
       }
       GetIdBydetailed(temp).then(res => {
         this.temp = res.data
+
+
         if(res.data.data.get_sules===null){
           this.fm='http://daka.xiaochendu.com/uploads/20190706/20c11258e303a8de3b0dd2f4e59a4fc5.jpeg';
           this.ci='骐骥一跃，不能十步;驽马十驾，功在不舍。坚持是一种信仰! ';
           this.drawCanvasBgImg();
+          console.log('没有封面')
           return ;
         }
         var sules = res.data.data.get_sules
@@ -60,20 +193,29 @@
             this.fm = sules[i].images_url;
             this.ci = sules[i].ci
             this.drawCanvasBgImg();
-
             return;
           }
           if (sules[i].day < this.temp.sum) {
             this.fm = sules[i].images_url;
             this.ci = sules[i].ci
+            this.drawCanvasBgImg();
+            return;
           }
         }
       })
-
-
     },
 
     methods: {
+      Punch(){
+        var temp = {
+          zhuti_id: this.$route.query.id,
+          user_id: this.$store.state.user_id,
+        }
+        postPunch(temp).then(res=>{
+          console.log(res)
+
+        })
+      },
       // 获取页面dpr和宽度
       getWindowInfo() {
         var windowInfo = {};
@@ -102,6 +244,7 @@
         img.setAttribute('crossOrigin','anonymous');
         //   img.crossOrigin = ""; //死坑的图片跨域 （img.crossOrigin = "Anonymous"这种写法还是不能显示base64格式图片）
         img.src = "http://daka.xiaochendu.com/static/ico/build.png"; //背景图
+        // img.src=this.qrCode
         img.onload = function () {
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           vm.drawPostersImg(canvas, ctx, dpr);
@@ -119,6 +262,7 @@
         img.setAttribute('crossOrigin','anonymous');
         img.src =
           this.fm;
+        // img.src=this.qrCode
         img.onload = function () {
           ctx.drawImage(img, imgX, imgY, imgWidth, imgheight);
           ctx.restore(); // 还原状态
@@ -132,6 +276,7 @@
         var img = new Image();
         img.setAttribute('crossOrigin','anonymous');
         img.src = this.$store.state.userInfo.avatar;
+        // img.src=this.qrCode
         img.onload = function () {
           // ctx.clearRect(0, 0, width, height);
           //开始路径画圆,剪切处理
@@ -230,6 +375,7 @@
         img.setAttribute('crossOrigin','anonymous');
         // img.crossOrigin = "";
         img.src = this.$store.state.config.wx;
+        // img.src=this.qrCode
 
         img.onload = function () {
           ctx.stroke();
@@ -278,12 +424,9 @@
         var imgY = 980; //图片Y开始坐标
         var imgWidth = 500;
         var imgHighth = 50;
-
         var img = new Image();
         img.setAttribute('crossOrigin','anonymous');
-
         img.src = 'http://daka.xiaochendu.com/static/ico/gz.png';
-
         img.onload = function () {
           ctx.stroke();
           ctx.drawImage(img, imgX, imgY, imgWidth, imgHighth);
@@ -329,6 +472,28 @@
 </script>
 
 <style lang="scss" scoped>
+  .main >>>.van-popup{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,.7);
+  }
+  .main >>>.van-popup img{
+    width: 100%;
+  }
+  .btn{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 30px;
+    width: 30%;
+    border-radius: 30px;
+    margin: auto;
+    background: #39bafc;
+    color: #fff;
+    margin-top: 20px;
+  }
   * {
     margin: 0;
     padding: 0;
@@ -369,5 +534,81 @@
   #btn2 {
     display: none;
     margin-bottom: 10px;
+  }
+
+
+  .show > > > .van-popup {
+    min-height: 100px;
+    min-width: 300px;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .show > > > .van-popup .ico .iconfont {
+    color: #39bafc;
+    font-weight: 800;
+    font-size: 0.9rem;
+  }
+
+  .show > > > .van-popup .ico {
+    font-size: 0.4rem;
+    text-align: center;
+  }
+
+  .show {
+    .desc {
+      font-size: 0.3rem;
+      color: rgb(134, 134, 134);
+      padding: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .qdbtn {
+      bottom: 10px;
+      position: fixed;
+      position: fixed;
+      width: 87%;
+      margin: auto;
+      text-align: center;
+      background: #fdce2f;
+      padding: 10px;
+      color: #654312;
+      font-size: 0.3rem;
+      font-weight: 800;
+      border-radius: 1rem;
+    }
+  }
+
+  .bodyHeight{
+    height:100px;
+  }
+  .contentToggle{
+    height:10px;
+    line-height:10px;
+    text-align: center;
+    color:red;
+    /*border:1px solid red;*/
+    border-radius: 5px;
+    margin-bottom:30px;
+  }
+  .hide-article-box{
+    position: absolute;
+    top: 206px;
+    width: 60%;
+    text-align: center;
+    background: #fff;
+    margin-left: 25%;
+  }
+  .yy{
+    display: flex;
+    align-items: center;
+    width: 100px;
+    audio{
+      width: 50px;
+    }
   }
 </style>

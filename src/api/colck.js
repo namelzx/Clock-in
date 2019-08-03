@@ -67,6 +67,18 @@ export function GetIdByUnsuDelete(query) {
 
 
 
+export function postPunch(data) {
+  return request({
+    url: 'postPunch',
+    method: 'post',
+    data
+  })
+};
+
+
+
+
+
 
 
 
