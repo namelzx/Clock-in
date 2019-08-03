@@ -200,6 +200,10 @@ export default {
         this.desc = this.detailed.desc;
         this.get_theme=this.detailed.get_theme
         this.continuousday = res.data.continuousday;
+        console.log(this.detailed.get_theme)
+        if(this.detailed.get_theme===null){
+          this.get_theme={};
+        }
 
         Toast.clear();
 
