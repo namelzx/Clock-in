@@ -13,7 +13,7 @@
   "dependencies": {
     "@xkeshi/vue-qrcode": "xkeshi/vue-qrcode",
     "animate.css": "^3.7.2",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "benz-amr-recorder": "^1.0.14",
     "canvas2image": "^1.0.5",
     "html2canvas": "^1.0.0-rc.3",
